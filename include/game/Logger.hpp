@@ -1,6 +1,8 @@
 #ifndef SNAKE_LOGGER_HPP
 #define SNAKE_LOGGER_HPP
 
+#include <game/Util.hpp>
+
 #include <iostream>
 
 namespace snake::logger {
