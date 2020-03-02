@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     static inline vk::PhysicalDevice get_physical_device(const VulkanContext& ctx) {
         auto physical_devices = ctx.instance.enumeratePhysicalDevices({}, ctx.dispatcher);
 
@@ -77,4 +77,4 @@ namespace snake::core::api {
 
         return device;
     }
-} // namespace snake::core::api
+} // namespace game::core::api

@@ -1,5 +1,5 @@
-#ifndef SNAKE_FORWARDS_HPP
-#define SNAKE_FORWARDS_HPP
+#ifndef GAME_FORWARDS_HPP
+#define GAME_FORWARDS_HPP
 
 struct GLFWwindow;
 
@@ -16,14 +16,14 @@ namespace vk {
     class Semaphore;
 } // namespace vk
 
-namespace snake::core {
+namespace game::core {
     class Window;
-} // namespace snake::core
+} // namespace game::core
 
-namespace snake::core::api {
+namespace game::core::api {
     struct VulkanContext;
     struct Device;
     struct Swapchain;
-} // namespace snake::core::api
+} // namespace game::core::api
 
-#endif //SNAKE_FORWARDS_HPP
+#endif //GAME_FORWARDS_HPP

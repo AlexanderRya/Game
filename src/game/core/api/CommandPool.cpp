@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     vk::CommandPool make_command_pool(const VulkanContext& ctx) {
         vk::CommandPoolCreateInfo command_pool_create_info{}; {
             command_pool_create_info.queueFamilyIndex = ctx.device.queue_family;
@@ -33,4 +33,4 @@ namespace snake::core::api {
 
         return pool;
     }
-} // namespace snake::core::api
+} // namespace game::core::api

@@ -1,5 +1,5 @@
-#ifndef SNAKE_VULKANCONTEXT_HPP
-#define SNAKE_VULKANCONTEXT_HPP
+#ifndef GAME_VULKANCONTEXT_HPP
+#define GAME_VULKANCONTEXT_HPP
 
 #include <game/Forwards.hpp>
 #include <game/Types.hpp>
@@ -8,7 +8,7 @@
 
 #include <vector>
 
-namespace snake::core::api {
+namespace game::core::api {
     struct Device {
         vk::PhysicalDevice physical{};
         vk::Device logical{};
@@ -46,6 +46,6 @@ namespace snake::core::api {
     };
 
     [[nodiscard]] VulkanContext make_vulkan_context(Window*);
-} // namespace snake::core::api
+} // namespace game::core::api
 
-#endif //SNAKE_VULKANCONTEXT_HPP
+#endif //GAME_VULKANCONTEXT_HPP

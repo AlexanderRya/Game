@@ -1,11 +1,13 @@
-#ifndef SNAKE_RENDERER_HPP
-#define SNAKE_RENDERER_HPP
+#ifndef GAME_RENDERER_HPP
+#define GAME_RENDERER_HPP
 
 #include <game/Forwards.hpp>
+#include <game/Types.hpp>
 
+#include <unordered_map>
 #include <vector>
 
-namespace snake::core::api {
+namespace game::core::api {
     class Renderer {
         std::vector<vk::Semaphore> image_available;
         std::vector<vk::Semaphore> render_finished;
@@ -15,6 +17,6 @@ namespace snake::core::api {
     public:
         explicit Renderer(const VulkanContext&);
     };
-} // namespace snake::core::api
+} // namespace game::core::api
 
-#endif //SNAKE_RENDERER_HPP
+#endif //GAME_RENDERER_HPP

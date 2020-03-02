@@ -1,10 +1,10 @@
-#ifndef SNAKE_SWAPCHAIN_HPP
-#define SNAKE_SWAPCHAIN_HPP
+#ifndef GAME_SWAPCHAIN_HPP
+#define GAME_SWAPCHAIN_HPP
 
 #include <game/Forwards.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     [[nodiscard]] Swapchain make_swapchain(const Window*, const VulkanContext&);
-} // namespace snake::core::apis
+} // namespace game::core::api
 
-#endif //SNAKE_SWAPCHAIN_HPP
+#endif //GAME_SWAPCHAIN_HPP

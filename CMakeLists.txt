@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
-project(Snake)
+project(Game)
 
 find_package(Vulkan REQUIRED)
 
 add_subdirectory(external/glfw)
 add_subdirectory(external/glm)
 
-include_directories(Snake
+include_directories(Game
         include
         external/glm
         external/glfw/include
@@ -18,7 +18,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(SNAKE_HEADERS
+set(GAME_HEADERS
         include/game/Logger.hpp
         include/game/Util.hpp
         include/game/Types.hpp
@@ -33,9 +33,11 @@ set(SNAKE_HEADERS
         include/game/core/api/DescriptorPool.hpp
         include/game/core/api/RenderPass.hpp
         include/game/core/api/Framebuffer.hpp
-        include/game/core/api/renderer/Renderer.hpp include/game/core/components/VertexBuffer.hpp)
+        include/game/core/api/renderer/Renderer.hpp
+        include/game/core/components/VertexBuffer.hpp
+        include/game/core/api/Pipeline.hpp)
 
-set(SNAKE_SOURCES
+set(GAME_SOURCES
         src/main.cpp
         src/game/Util.cpp
         src/game/core/Window.cpp
@@ -48,26 +50,27 @@ set(SNAKE_SOURCES
         src/game/core/api/DescriptorPool.cpp
         src/game/core/api/RenderPass.cpp
         src/game/core/api/Framebuffer.cpp
-        src/game/core/api/renderer/Renderer.cpp)
+        src/game/core/api/renderer/Renderer.cpp
+        src/game/core/api/Pipeline.cpp include/game/core/Game.hpp src/game/core/Game.cpp)
 
-add_executable(Snake
-        ${SNAKE_HEADERS}
-        ${SNAKE_SOURCES})
+add_executable(Game
+        ${GAME_HEADERS}
+        ${GAME_SOURCES})
 
-target_compile_options(Snake PRIVATE -std=c++20 -O3 -pedantic -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
 
 if (WIN32)
-    target_compile_definitions(Snake PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(Game PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
 if (UNIX)
     if (CMAKE_BUILD_TYPE MATCHES Debug)
-        target_compile_definitions(Snake PRIVATE _GLIBCXX_DEBUG)
+        target_compile_definitions(Game PRIVATE _GLIBCXX_DEBUG)
     endif()
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
-    target_compile_definitions(Snake PRIVATE SNAKE_DEBUG)
+    target_compile_definitions(Game PRIVATE GAME_DEBUG)
 endif()
 
 if (UNIX)
@@ -78,7 +81,7 @@ if (UNIX)
 endif()
 
 if (WIN32)
-    target_link_libraries(Snake glfw)
+    target_link_libraries(Game glfw)
 elseif (UNIX)
-    target_link_libraries(Snake glfw pthread)
+    target_link_libraries(Game glfw pthread)
 endif()

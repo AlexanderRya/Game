@@ -11,7 +11,7 @@
 #include <game/Logger.hpp>
 #include <game/Util.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     static inline void load_vulkan_module(VulkanContext& ctx) {
         auto module = util::load_module(util::vulkan_module);
 
@@ -31,7 +31,7 @@ namespace snake::core::api {
         ctx.window = window;
         ctx.instance = make_instance(ctx);
         ctx.dispatcher.init(static_cast<VkInstance>(ctx.instance), ctx.dispatcher.vkGetInstanceProcAddr);
-#if SNAKE_DEBUG
+#if GAME_DEBUG
         logger::warning("Vulkan debug mode active, performance may be lower than usual");
         ctx.validation = install_validation_layers(ctx);
 #endif
@@ -49,4 +49,4 @@ namespace snake::core::api {
 
         return ctx;
     }
-} // namespace snake::core::api
+} // namespace game::core::api

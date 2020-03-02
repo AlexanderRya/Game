@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     vk::RenderPass make_default_render_pass(const VulkanContext& ctx) {
         vk::AttachmentDescription attachment_description{}; {
             attachment_description.format = ctx.swapchain.format.format;

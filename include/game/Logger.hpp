@@ -1,11 +1,11 @@
-#ifndef SNAKE_LOGGER_HPP
-#define SNAKE_LOGGER_HPP
+#ifndef GAME_LOGGER_HPP
+#define GAME_LOGGER_HPP
 
 #include <game/Util.hpp>
 
 #include <iostream>
 
-namespace snake::logger {
+namespace game::logger {
     template <typename ...Args>
     void info(Args&& ...args) {
         std::cout << util::format(
@@ -32,6 +32,6 @@ namespace snake::logger {
 
         (((std::cout << args), ...), std::cout << "\n");
     }
-} // namespace snake::logger
+} // namespace game::logger
 
-#endif //SNAKE_LOGGER_HPP
+#endif //GAME_LOGGER_HPP

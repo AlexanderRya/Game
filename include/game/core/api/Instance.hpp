@@ -1,11 +1,11 @@
-#ifndef SNAKE_INSTANCE_HPP
-#define SNAKE_INSTANCE_HPP
+#ifndef GAME_INSTANCE_HPP
+#define GAME_INSTANCE_HPP
 
 #include <game/Forwards.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     [[nodiscard]] vk::Instance make_instance(const VulkanContext&);
     [[nodiscard]] vk::DebugUtilsMessengerEXT install_validation_layers(const VulkanContext&);
-} // namespace snake::core::api
+} // namespace game::core::api
 
-#endif //SNAKE_INSTANCE_HPP
+#endif //GAME_INSTANCE_HPP

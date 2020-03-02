@@ -1,5 +1,5 @@
-#ifndef SNAKE_UTIL_HPP
-#define SNAKE_UTIL_HPP
+#ifndef GAME_UTIL_HPP
+#define GAME_UTIL_HPP
 
 #include <game/Types.hpp>
 
@@ -7,16 +7,21 @@
 #include <sstream>
 #include <utility>
 
-namespace snake::util {
+#if _WIN32
+    #include <Windows.h>
+    #include <libloaderapi.h>
+#elif __linux__
+    #include <dlfcn.h>
+#endif
+
+namespace game::util {
 #if _WIN32
     constexpr inline const wchar_t* vulkan_module = L"vulkan-1.dll";
-    #include <libloaderapi.h>
     HMODULE load_module(LPCWSTR name);
     void (*load_symbol(HMODULE handle, LPCSTR symbol))();
     void close_module(HMODULE handle);
 #elif __linux__
     constexpr inline const char* vulkan_module = "libvulkan.so";
-    #include <dlfcn.h>
     void* load_module(const char* name);
     void (*load_symbol(void* handle, const char* symbol))();
     void close_module(void* handle);
@@ -56,6 +61,6 @@ namespace snake::util {
     }
 
     [[nodiscard]] std::string get_current_timestamp();
-} // namespace snake::util
+} // namespace game::util
 
-#endif //SNAKE_UTIL_HPP
+#endif //GAME_UTIL_HPP

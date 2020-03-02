@@ -7,7 +7,7 @@
 
 #include <stdexcept>
 
-namespace snake::core {
+namespace game::core {
     Window::Window(const i32 w, const i32 h, const char* title) {
         glfwSetErrorCallback([](const i32 code, const char* message) {
             std::cout << util::format(
@@ -59,4 +59,4 @@ namespace snake::core {
     void Window::close() const {
         glfwSetWindowShouldClose(window, true);
     }
-} // namespace snake::core
+} // namespace game::core

@@ -1,10 +1,10 @@
-#ifndef SNAKE_WINDOW_HPP
-#define SNAKE_WINDOW_HPP
+#ifndef GAME_WINDOW_HPP
+#define GAME_WINDOW_HPP
 
 #include <game/Forwards.hpp>
 #include <game/Types.hpp>
 
-namespace snake::core {
+namespace game::core {
     class Window {
         GLFWwindow* window{};
     public:
@@ -24,6 +24,6 @@ namespace snake::core {
         void close() const;
         [[nodiscard]] bool should_close() const;
     };
-} // namespace caelus::core
+} // namespace game::core
 
-#endif //SNAKE_WINDOW_HPP
+#endif //GAME_WINDOW_HPP

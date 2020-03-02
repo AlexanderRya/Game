@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     std::vector<vk::Framebuffer> make_default_framebuffers(const VulkanContext& ctx) {
         std::vector<vk::Framebuffer> framebuffers{};
         framebuffers.reserve(ctx.swapchain.image_count);
@@ -28,4 +28,4 @@ namespace snake::core::api {
 
         return framebuffers;
     }
-} // namespace snake::core::api
+} // namespace game::core::api

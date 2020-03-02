@@ -1,7 +1,10 @@
-#ifndef SNAKE_TYPES_HPP
-#define SNAKE_TYPES_HPP
+#ifndef GAME_TYPES_HPP
+#define GAME_TYPES_HPP
 
-namespace snake {
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+
+namespace game {
     using i8 = signed char;
     using i16 = signed short;
     using i32 = signed int;
@@ -17,6 +20,11 @@ namespace snake {
 
     using isize = i64;
     using usize = u64;
-} // namespace snake
 
-#endif //SNAKE_TYPES_HPP
+    struct Vertex {
+        glm::vec3 pos;
+        glm::vec2 tx_coords;
+    };
+} // namespace game
+
+#endif //GAME_TYPES_HPP

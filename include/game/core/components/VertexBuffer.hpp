@@ -1,8 +1,10 @@
-#ifndef SNAKE_VERTEXBUFFER_HPP
-#define SNAKE_VERTEXBUFFER_HPP
+#ifndef GAME_VERTEXBUFFER_HPP
+#define GAME_VERTEXBUFFER_HPP
 
-namespace snake::core::components {
+namespace game::core::components {
+    struct VertexBuffer {
 
-} // namespace snake::core::components
+    };
+} // namespace game::core::components
 
-#endif //SNAKE_VERTEXBUFFER_HPP
+#endif //GAME_VERTEXBUFFER_HPP

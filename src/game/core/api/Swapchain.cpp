@@ -6,7 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     static inline u32 get_image_count(const vk::SurfaceCapabilitiesKHR& capabilities) {
         auto count = capabilities.minImageCount + 1;
 
@@ -136,4 +136,4 @@ namespace snake::core::api {
 
         return details;
     }
-} // namespace snake::core::api
+} // namespace game::core::api

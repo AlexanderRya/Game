@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-namespace snake::core::api {
+namespace game::core::api {
     static std::string get_message_type(const VkDebugUtilsMessageTypeFlagsEXT& type) {
         switch (type) {
             case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT: {
@@ -94,7 +94,7 @@ namespace snake::core::api {
         if (enabled_extensions.size() != count) {
             throw std::runtime_error("Required extension not supported.");
         }
-#ifdef SNAKE_DEBUG
+#ifdef GAME_DEBUG
         enabled_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
         return enabled_extensions;
@@ -119,7 +119,7 @@ namespace snake::core::api {
 
             instance_create_info.ppEnabledExtensionNames = enabled_exts.data();
             instance_create_info.enabledExtensionCount = enabled_exts.size();
-#ifdef SNAKE_DEBUG
+#ifdef GAME_DEBUG
             instance_create_info.ppEnabledLayerNames = &validation_layer;
             instance_create_info.enabledLayerCount = 1;
 #else
@@ -146,4 +146,4 @@ namespace snake::core::api {
 
         return ctx.instance.createDebugUtilsMessengerEXT(create_info, nullptr, ctx.dispatcher);
     }
-} // namespace snake::core::api
+} // namespace game::core::api

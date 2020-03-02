@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     vk::DescriptorPool make_descriptor_pool(const VulkanContext& ctx) {
         std::array<vk::DescriptorPoolSize, 11> descriptor_pool_sizes{ {
             { vk::DescriptorType::eSampler, 1000 },
@@ -36,4 +36,4 @@ namespace snake::core::api {
 
         return pool;
     }
-} // namespace snake::core::api
+} // namespace game::core::api

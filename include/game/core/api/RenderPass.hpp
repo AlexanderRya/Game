@@ -1,10 +1,10 @@
-#ifndef SNAKE_RENDERPASS_HPP
-#define SNAKE_RENDERPASS_HPP
+#ifndef GAME_RENDERPASS_HPP
+#define GAME_RENDERPASS_HPP
 
 #include <game/Forwards.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     [[nodiscard]] vk::RenderPass make_default_render_pass(const VulkanContext&);
-} // namespace snake::core::api
+} // namespace game::core::api
 
-#endif //SNAKE_RENDERPASS_HPP
+#endif //GAME_RENDERPASS_HPP

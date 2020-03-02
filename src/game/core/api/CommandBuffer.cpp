@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace snake::core::api {
+namespace game::core::api {
     std::vector<vk::CommandBuffer> make_rendering_command_buffers(const VulkanContext& ctx) {
         vk::CommandBufferAllocateInfo allocate_info{}; {
             allocate_info.commandPool = ctx.command_pool;
@@ -19,4 +19,4 @@ namespace snake::core::api {
 
         return buffers;
     }
-} // namespace snake::core::api
+} // namespace game::core::api

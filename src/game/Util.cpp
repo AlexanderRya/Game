@@ -3,9 +3,8 @@
 #include <chrono>
 #include <string>
 
-namespace snake::util {
+namespace game::util {
 #if _WIN32
-    #include <libloaderapi.h>
     HMODULE load_module(LPCWSTR name) {
         return LoadLibraryW(name);
     }
@@ -16,7 +15,6 @@ namespace snake::util {
         FreeLibrary(handle);
     }
 #elif __linux__
-#include <dlfcn.h>
     void* load_module(const char* name) {
         return dlopen(name, RTLD_LAZY | RTLD_LOCAL);
     }
@@ -38,4 +36,4 @@ namespace snake::util {
 
         return buf;
     }
-} // namespace snake::util
+} // namespace game::util
