@@ -65,7 +65,7 @@ add_executable(Game
         ${GAME_HEADERS}
         ${GAME_SOURCES})
 
-target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
 
 if (WIN32)
     target_compile_definitions(Game PRIVATE _CRT_SECURE_NO_WARNINGS)

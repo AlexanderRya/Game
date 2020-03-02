@@ -10,8 +10,6 @@ namespace game::core::components {
     struct VertexBuffer {
         vk::Buffer handle{};
         vk::DeviceMemory memory{};
-
-        u64 vertex_count{};
     };
 
     [[nodiscard]] VertexBuffer make_vertex_buffer(const std::vector<Vertex>&, const api::VulkanContext&);

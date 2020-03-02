@@ -1,9 +1,9 @@
+#include <game/core/api/renderer/RenderGraph.hpp>
 #include <game/core/components/VertexBuffer.hpp>
 #include <game/core/api/renderer/Renderer.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/CommandBuffer.hpp>
 #include <game/core/components/Mesh.hpp>
-#include <game/core/api/renderer/RenderGraph.hpp>
 
 namespace game::core::api {
     Renderer::Renderer(const api::VulkanContext& context)
@@ -12,13 +12,19 @@ namespace game::core::api {
 
         vk::SemaphoreCreateInfo semaphore_create_info{};
 
-        image_available.resize(in_flight, ctx.device.logical.createSemaphore(semaphore_create_info, nullptr, ctx.dispatcher));
-        render_finished.resize(in_flight, ctx.device.logical.createSemaphore(semaphore_create_info, nullptr, ctx.dispatcher));
+        image_available.reserve(in_flight);
+        render_finished.reserve(in_flight);
+
+        for (int i = 0; i < in_flight; ++i) {
+            image_available.emplace_back(ctx.device.logical.createSemaphore(semaphore_create_info, nullptr, ctx.dispatcher));
+            render_finished.emplace_back(ctx.device.logical.createSemaphore(semaphore_create_info, nullptr, ctx.dispatcher));
+        }
+
         frames_in_flight.resize(in_flight, nullptr);
     }
 
     void Renderer::init_rendering_data() {
-        vertex_buffers[0] = (components::make_vertex_buffer(components::generate_triangle_geometry(), ctx));
+        vertex_buffers[0] = components::make_vertex_buffer(components::generate_triangle_geometry(), ctx);
     }
 
     void Renderer::acquire_frame() {
@@ -36,11 +42,12 @@ namespace game::core::api {
     }
 
     void Renderer::build(RenderGraph& graph) {
+        auto& command_buffer = command_buffers[image_index];
         vk::CommandBufferBeginInfo begin_info{}; {
             begin_info.flags |= vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
         }
 
-        command_buffers[image_index].begin(begin_info, ctx.dispatcher);
+        command_buffer.begin(begin_info, ctx.dispatcher);
 
         vk::ClearValue clear_value{}; {
             clear_value.color = graph.clear_color;
@@ -68,13 +75,22 @@ namespace game::core::api {
             scissor.offset = { { 0, 0 } };
         }
 
-        command_buffers[image_index].setViewport(0, viewport, ctx.dispatcher);
-        command_buffers[image_index].setScissor(0, scissor, ctx.dispatcher);
+        command_buffer.setViewport(0, viewport, ctx.dispatcher);
+        command_buffer.setScissor(0, scissor, ctx.dispatcher);
 
-        command_buffers[image_index].beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
-        command_buffers[image_index].endRenderPass(ctx.dispatcher);
+        command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
 
-        command_buffers[image_index].end(ctx.dispatcher);
+        // Start mesh pass
+        command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graph.pipelines[0].handle, ctx.dispatcher);
+
+        for (const auto& mesh : graph.meshes) {
+            command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].handle, 0ull, ctx.dispatcher);
+            command_buffer.draw(mesh.vertex_count, 1, 0, 0, ctx.dispatcher);
+        }
+
+        command_buffer.endRenderPass(ctx.dispatcher);
+
+        command_buffer.end(ctx.dispatcher);
     }
 
     void Renderer::draw() {

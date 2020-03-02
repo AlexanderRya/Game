@@ -3,8 +3,8 @@
 #include <game/Types.hpp>
 #include <game/Util.hpp>
 
-#include <GLFW/glfw3.h>
 #include <vulkan/vulkan.hpp>
+#include <GLFW/glfw3.h>
 
 #include <iostream>
 
@@ -143,7 +143,7 @@ namespace game::core::api {
                 vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
             create_info.pfnUserCallback = vulkan_debug_callback;
         }
-
+        
         return ctx.instance.createDebugUtilsMessengerEXT(create_info, nullptr, ctx.dispatcher);
     }
 } // namespace game::core::api

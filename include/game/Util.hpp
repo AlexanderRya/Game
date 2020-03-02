@@ -21,7 +21,7 @@ namespace game::util {
     void (*load_symbol(HMODULE, LPCSTR))();
     void close_module(HMODULE);
 #elif __linux__
-    constexpr inline const char* vulkan_module = "libvulkan.so";
+    constexpr inline const char* vulkan_module = "libvulkan.so.1";
     void* load_module(const char*);
     void (*load_symbol(void*, const char*))();
     void close_module(void*);

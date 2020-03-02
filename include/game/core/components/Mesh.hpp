@@ -7,12 +7,7 @@
 
 namespace game::core::components {
     struct Mesh {
-        struct CreateInfo {
-            std::vector<Vertex> vertices;
-            u64 pipeline_id;
-        };
-
-        u64 pipeline_id;
+        u64 vertex_count;
         u64 vertex_buffer_id;
     };
 

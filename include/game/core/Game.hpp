@@ -8,7 +8,7 @@
 namespace game::core {
     class Game {
         Window window;
-        api::VulkanContext vulkan_context;
+        api::VulkanContext context;
         api::Renderer renderer;
     public:
         Game();
