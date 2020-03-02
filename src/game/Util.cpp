@@ -5,8 +5,8 @@
 
 namespace game::util {
 #if _WIN32
-    HMODULE load_module(LPCWSTR name) {
-        return LoadLibraryW(name);
+    HMODULE load_module(LPCSTR name) {
+        return LoadLibraryA(name);
     }
     void (*load_symbol(HMODULE handle, LPCSTR symbol))() {
         return reinterpret_cast<void(*)()>(GetProcAddress(handle, symbol));

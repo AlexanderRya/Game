@@ -40,7 +40,6 @@ namespace game::core::api {
         vk::CommandPool command_pool{};
         vk::CommandPool transient_pool{};
         vk::DescriptorPool descriptor_pool{};
-        std::vector<vk::CommandBuffer> command_buffers{};
         vk::RenderPass default_render_pass{};
         std::vector<vk::Framebuffer> default_framebuffers{};
     };

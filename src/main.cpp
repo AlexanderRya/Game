@@ -2,5 +2,6 @@
 
 int main() {
     game::core::Game game;
+    game.run();
     return 0;
 }

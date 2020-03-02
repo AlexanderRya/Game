@@ -40,7 +40,6 @@ namespace game::core::api {
         ctx.swapchain = make_swapchain(window, ctx);
         ctx.command_pool = make_command_pool(ctx);
         ctx.transient_pool = make_transient_pool(ctx);
-        ctx.command_buffers = make_rendering_command_buffers(ctx);
         ctx.descriptor_pool = make_descriptor_pool(ctx);
         ctx.default_render_pass = make_default_render_pass(ctx);
         ctx.default_framebuffers = make_default_framebuffers(ctx);

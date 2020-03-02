@@ -12,6 +12,8 @@ namespace game::core {
         api::Renderer renderer;
     public:
         Game();
+
+        void run();
     };
 } // namespace game::core
 

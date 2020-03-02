@@ -16,15 +16,15 @@
 
 namespace game::util {
 #if _WIN32
-    constexpr inline const wchar_t* vulkan_module = L"vulkan-1.dll";
-    HMODULE load_module(LPCWSTR name);
-    void (*load_symbol(HMODULE handle, LPCSTR symbol))();
-    void close_module(HMODULE handle);
+    constexpr inline const char* vulkan_module = "vulkan-1.dll";
+    HMODULE load_module(LPCSTR);
+    void (*load_symbol(HMODULE, LPCSTR))();
+    void close_module(HMODULE);
 #elif __linux__
     constexpr inline const char* vulkan_module = "libvulkan.so";
-    void* load_module(const char* name);
-    void (*load_symbol(void* handle, const char* symbol))();
-    void close_module(void* handle);
+    void* load_module(const char*);
+    void (*load_symbol(void*, const char*))();
+    void close_module(void*);
 #endif
     template <typename ...Args>
     [[nodiscard]] std::string format(const std::string& str, Args&& ...args) {

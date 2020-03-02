@@ -77,4 +77,17 @@ namespace game::core::api {
 
         return device;
     }
+
+    u64 find_memory_type(const VulkanContext& ctx, const u32 mask, const vk::MemoryPropertyFlags& flags) {
+        const vk::PhysicalDeviceMemoryProperties memory_properties = ctx.device.physical.getMemoryProperties(ctx.dispatcher);
+
+        for (u32 i = 0; i < memory_properties.memoryTypeCount; ++i) {
+            if ((mask & (1u << i)) &&
+                (memory_properties.memoryTypes[i].propertyFlags & flags) == flags) {
+                return i;
+            }
+        }
+
+        throw std::runtime_error("Failed to find memory type");
+    }
 } // namespace game::core::api

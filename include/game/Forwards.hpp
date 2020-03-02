@@ -24,6 +24,11 @@ namespace game::core::api {
     struct VulkanContext;
     struct Device;
     struct Swapchain;
+    struct RenderGraph;
+} // namespace game::core::api
+
+namespace game::core::components {
+    struct VertexBuffer;
 } // namespace game::core::api
 
 #endif //GAME_FORWARDS_HPP
