@@ -37,13 +37,9 @@ namespace game::core {
     }
 
     vk::SurfaceKHR Window::create_surface(const api::VulkanContext& ctx) const {
-        vk::SurfaceKHR surface;
+        VkSurfaceKHR surface;
 
-        glfwCreateWindowSurface(
-            static_cast<VkInstance>(ctx.instance),
-            window,
-            nullptr,
-            reinterpret_cast<VkSurfaceKHR*>(&surface));
+        glfwCreateWindowSurface(static_cast<VkInstance>(ctx.instance), window, nullptr, &surface);
 
         return surface;
     }

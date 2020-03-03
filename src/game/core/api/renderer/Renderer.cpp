@@ -1,9 +1,11 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
-#include <game/core/components/VertexBuffer.hpp>
 #include <game/core/api/renderer/Renderer.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/CommandBuffer.hpp>
+#include <game/core/api/VertexBuffer.hpp>
 #include <game/core/components/Mesh.hpp>
+#include <game/core/api/Pipeline.hpp>
+#include <game/Constants.hpp>
 
 namespace game::core::api {
     Renderer::Renderer(const api::VulkanContext& context)
@@ -12,19 +14,19 @@ namespace game::core::api {
 
         vk::SemaphoreCreateInfo semaphore_create_info{};
 
-        image_available.reserve(in_flight);
-        render_finished.reserve(in_flight);
+        image_available.reserve(meta::frames_in_flight);
+        render_finished.reserve(meta::frames_in_flight);
 
-        for (int i = 0; i < in_flight; ++i) {
+        for (u64 i = 0; i < meta::frames_in_flight; ++i) {
             image_available.emplace_back(ctx.device.logical.createSemaphore(semaphore_create_info, nullptr, ctx.dispatcher));
             render_finished.emplace_back(ctx.device.logical.createSemaphore(semaphore_create_info, nullptr, ctx.dispatcher));
         }
 
-        frames_in_flight.resize(in_flight, nullptr);
+        frames_in_flight.resize(meta::frames_in_flight, nullptr);
     }
 
     void Renderer::init_rendering_data() {
-        vertex_buffers[0] = components::make_vertex_buffer(components::generate_triangle_geometry(), ctx);
+        vertex_buffers[0] = api::make_vertex_buffer(components::generate_triangle_geometry(), ctx);
     }
 
     void Renderer::acquire_frame() {
@@ -84,7 +86,14 @@ namespace game::core::api {
         command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graph.pipelines[0].handle, ctx.dispatcher);
 
         for (const auto& mesh : graph.meshes) {
-            command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].handle, 0ull, ctx.dispatcher);
+            command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
+            command_buffer.bindDescriptorSets(
+                vk::PipelineBindPoint::eGraphics,
+                graph.layouts[meta::PipelineLayoutType::MeshGeneric].pipeline,
+                0,
+                mesh.descriptor_set[current_frame],
+                nullptr,
+                ctx.dispatcher);
             command_buffer.draw(mesh.vertex_count, 1, 0, 0, ctx.dispatcher);
         }
 
@@ -118,6 +127,6 @@ namespace game::core::api {
 
         ctx.device.queue.presentKHR(present_info, ctx.dispatcher);
 
-        current_frame = (current_frame + 1) % in_flight;
+        current_frame = (current_frame + 1) % meta::frames_in_flight;
     }
 } // namespace game::core::api

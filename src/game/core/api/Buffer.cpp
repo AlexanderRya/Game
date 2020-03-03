@@ -1,4 +1,4 @@
-#include <game/core/components/VertexBuffer.hpp>
+#include <game/core/api/VertexBuffer.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/CommandBuffer.hpp>
 #include <game/core/api/Device.hpp>

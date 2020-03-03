@@ -10,7 +10,7 @@
 namespace game::core::api {
     struct PipelineLayout {
         vk::PipelineLayout pipeline{};
-        vk::DescriptorSetLayout descriptor_set{};
+        vk::DescriptorSetLayout set{};
     };
 
     struct Pipeline {

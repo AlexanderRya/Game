@@ -6,13 +6,13 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace game::core::components {
+namespace game::core::api {
     struct VertexBuffer {
         vk::Buffer handle{};
         vk::DeviceMemory memory{};
     };
 
     [[nodiscard]] VertexBuffer make_vertex_buffer(const std::vector<Vertex>&, const api::VulkanContext&);
-} // namespace game::core::components
+} // namespace game::core::api
 
 #endif //GAME_VERTEXBUFFER_HPP

@@ -25,10 +25,13 @@ namespace game::core::api {
     struct Device;
     struct Swapchain;
     struct RenderGraph;
+    class DescriptorSet;
 } // namespace game::core::api
 
-namespace game::core::components {
+namespace game::core::api {
     struct VertexBuffer;
+    class MappedBuffer;
+    class SingleMappedBuffer;
 } // namespace game::core::api
 
 #endif //GAME_FORWARDS_HPP

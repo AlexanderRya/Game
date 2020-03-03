@@ -1,6 +1,9 @@
 #ifndef GAME_TYPES_HPP
 #define GAME_TYPES_HPP
 
+#include <vector>
+
+#include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
@@ -24,6 +27,14 @@ namespace game {
     struct Vertex {
         glm::vec3 pos;
         glm::vec2 tx_coords;
+    };
+
+    struct CameraData {
+        glm::mat4 pv_matrix;
+    };
+
+    struct Instance {
+        glm::mat4 instances;
     };
 } // namespace game
 

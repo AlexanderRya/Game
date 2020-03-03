@@ -1,7 +1,8 @@
 #ifndef GAME_RENDERER_HPP
 #define GAME_RENDERER_HPP
 
-#include <game/core/components/VertexBuffer.hpp>
+#include <game/core/api/VertexBuffer.hpp>
+#include <game/Constants.hpp>
 #include <game/Forwards.hpp>
 #include <game/Types.hpp>
 
@@ -16,12 +17,10 @@ namespace game::core::api {
 
         std::vector<vk::CommandBuffer> command_buffers;
 
-        constexpr static inline auto in_flight = 2;
-
         const VulkanContext& ctx;
 
         // Drawing stuff
-        std::unordered_map<u64, components::VertexBuffer> vertex_buffers;
+        std::unordered_map<u64, api::VertexBuffer> vertex_buffers;
 
         u32 image_index{};
         u32 current_frame{};

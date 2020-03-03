@@ -4,6 +4,7 @@
 #include <game/Types.hpp>
 
 #include <fstream>
+#include <game/Constants.hpp>
 
 namespace game::core::api {
     static inline vk::ShaderModule load_module(const VulkanContext* ctx, const std::filesystem::path& path) {
@@ -33,12 +34,12 @@ namespace game::core::api {
         std::array<vk::DescriptorSetLayoutBinding, 2> layout_bindings{}; {
             layout_bindings[0].descriptorCount = 1;
             layout_bindings[0].descriptorType = vk::DescriptorType::eUniformBuffer;
-            layout_bindings[0].binding = 0;
+            layout_bindings[0].binding = static_cast<u32>(meta::PipelineBinding::Camera);
             layout_bindings[0].stageFlags = vk::ShaderStageFlagBits::eVertex;
 
             layout_bindings[1].descriptorCount = 1;
             layout_bindings[1].descriptorType = vk::DescriptorType::eStorageBuffer;
-            layout_bindings[1].binding = 1;
+            layout_bindings[1].binding = static_cast<u32>(meta::PipelineBinding::Instance);
             layout_bindings[1].stageFlags = vk::ShaderStageFlagBits::eVertex;
         }
 
@@ -47,11 +48,11 @@ namespace game::core::api {
             set_layout_create_info.pBindings = layout_bindings.data();
         }
 
-        layout.descriptor_set = ctx.device.logical.createDescriptorSetLayout(set_layout_create_info, nullptr, ctx.dispatcher);
+        layout.set = ctx.device.logical.createDescriptorSetLayout(set_layout_create_info, nullptr, ctx.dispatcher);
 
         vk::PipelineLayoutCreateInfo layout_create_info{}; {
             layout_create_info.setLayoutCount = 1;
-            layout_create_info.pSetLayouts = &layout.descriptor_set;
+            layout_create_info.pSetLayouts = &layout.set;
             layout_create_info.pushConstantRangeCount = 0;
             layout_create_info.pPushConstantRanges = nullptr;
         }

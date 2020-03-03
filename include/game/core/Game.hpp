@@ -3,7 +3,11 @@
 
 #include <game/core/api/renderer/Renderer.hpp>
 #include <game/core/api/VulkanContext.hpp>
+#include <game/core/api/Pipeline.hpp>
 #include <game/core/Window.hpp>
+#include <game/Forwards.hpp>
+
+#include <unordered_map>
 
 namespace game::core {
     class Game {

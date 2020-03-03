@@ -34,12 +34,15 @@ set(GAME_HEADERS
         include/game/core/api/RenderPass.hpp
         include/game/core/api/Framebuffer.hpp
         include/game/core/api/renderer/Renderer.hpp
-        include/game/core/components/VertexBuffer.hpp
+        include/game/core/api/VertexBuffer.hpp
         include/game/core/api/Pipeline.hpp
         include/game/core/components/Mesh.hpp
         include/game/core/Game.hpp
         include/game/core/api/Buffer.hpp
-        include/game/core/api/renderer/RenderGraph.hpp)
+        include/game/core/api/renderer/RenderGraph.hpp
+        include/game/core/api/DescriptorSet.hpp
+        include/game/Constants.hpp
+        include/game/core/api/MappedBuffer.hpp)
 
 set(GAME_SOURCES
         src/main.cpp
@@ -57,9 +60,11 @@ set(GAME_SOURCES
         src/game/core/api/renderer/Renderer.cpp
         src/game/core/api/Pipeline.cpp
         src/game/core/Game.cpp
-        src/game/core/components/VertexBuffer.cpp
+        src/game/core/api/VertexBuffer.cpp
         src/game/core/api/Buffer.cpp
-        src/game/core/components/Mesh.cpp)
+        src/game/core/components/Mesh.cpp
+        src/game/core/api/DescriptorSet.cpp
+        src/game/core/api/MappedBuffer.cpp src/game/core/api/renderer/RenderGraph.cpp)
 
 add_executable(Game
         ${GAME_HEADERS}

@@ -3,6 +3,7 @@
 
 #include <game/core/components/Mesh.hpp>
 #include <game/core/api/Pipeline.hpp>
+#include <game/Constants.hpp>
 #include <game/Forwards.hpp>
 #include <game/Types.hpp>
 
@@ -14,10 +15,15 @@ namespace game::core::api {
     struct RenderGraph {
         vk::ClearColorValue clear_color{};
 
+        CameraData camera_data{};
+        api::MappedBuffer camera_buffer{};
+
         std::unordered_map<u64, api::Pipeline> pipelines;
-        std::unordered_map<u64, api::PipelineLayout> pipeline_layouts;
+        std::unordered_map<meta::PipelineLayoutType, api::PipelineLayout> layouts;
 
         std::vector<components::Mesh> meshes;
+
+        void build(const VulkanContext&);
     };
 } // namespace game::core::api
 

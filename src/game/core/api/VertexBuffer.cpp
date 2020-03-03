@@ -1,10 +1,10 @@
-#include <game/core/components/VertexBuffer.hpp>
+#include <game/core/api/VertexBuffer.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/Device.hpp>
 #include <game/core/api/Buffer.hpp>
 #include <game/Logger.hpp>
 
-namespace game::core::components {
+namespace game::core::api {
     VertexBuffer make_vertex_buffer(const std::vector<Vertex>& vertices, const api::VulkanContext& ctx) {
         vk::Buffer temp_buffer{};
         vk::DeviceMemory temp_memory{};
@@ -46,4 +46,4 @@ namespace game::core::components {
 
         return vertex_buffer;
     }
-} // namespace game::core::components
+} // namespace game::core::api
