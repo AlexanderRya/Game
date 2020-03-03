@@ -1,4 +1,6 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
+#include <game/core/components/Camera.hpp>
+#include <game/core/Globals.hpp>
 #include <game/core/Game.hpp>
 
 namespace game::core {
@@ -33,6 +35,16 @@ namespace game::core {
         graph.build(context);
 
         while (!window.should_close()) {
+            f32 current_frame = glfwGetTime();
+            delta_time = current_frame - last_frame;
+            last_frame = current_frame;
+
+            if (window.get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+                window.close();
+            }
+
+            camera.move(window);
+
             renderer.acquire_frame();
             renderer.build(graph);
             renderer.draw();

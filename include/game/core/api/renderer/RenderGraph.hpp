@@ -1,6 +1,7 @@
 #ifndef GAME_RENDERGRAPH_HPP
 #define GAME_RENDERGRAPH_HPP
 
+#include <game/core/components/Camera.hpp>
 #include <game/core/components/Mesh.hpp>
 #include <game/core/api/Pipeline.hpp>
 #include <game/Constants.hpp>

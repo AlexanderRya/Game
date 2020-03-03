@@ -1,6 +1,8 @@
 #ifndef GAME_BUFFER_HPP
 #define GAME_BUFFER_HPP
 
+#include <vk_mem_alloc.h>
+
 #include <game/Forwards.hpp>
 #include <game/Types.hpp>
 

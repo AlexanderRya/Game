@@ -9,7 +9,7 @@ namespace game::core {
         GLFWwindow* window{};
     public:
         static inline bool resized = true;
-        u32 width{}, height{};
+        static inline u32 width{}, height{};
 
         Window(const i32, const i32, const char*);
 
@@ -23,6 +23,7 @@ namespace game::core {
         void poll_events() const;
         void close() const;
         [[nodiscard]] bool should_close() const;
+        [[nodiscard]] i32 get_key(const i32) const;
     };
 } // namespace game::core
 

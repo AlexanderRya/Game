@@ -37,10 +37,11 @@ namespace game::core::api {
 
     static inline vk::Device get_device(const u32 queue_family, const vk::PhysicalDevice& physical_device, const vk::DispatchLoaderDynamic& dispatcher) {
         auto extensions = physical_device.enumerateDeviceExtensionProperties(nullptr, {}, dispatcher);
-        constexpr const char* surface_ext[]{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
-        if (std::find_if(extensions.begin(), extensions.end(), [](const vk::ExtensionProperties& properties){
-            return std::strcmp(properties.extensionName, surface_ext[0]) == 0;
+        constexpr const char* enabled_exts[]{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
+        if (std::find_if(extensions.begin(), extensions.end(), [](const vk::ExtensionProperties& properties) {
+            return std::strcmp(properties.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0;
         }) != extensions.end()) {
             float priorities[]{ 1.0f };
 
@@ -51,7 +52,7 @@ namespace game::core::api {
             }
 
             vk::DeviceCreateInfo device_create_info{}; {
-                device_create_info.ppEnabledExtensionNames = surface_ext;
+                device_create_info.ppEnabledExtensionNames = enabled_exts;
                 device_create_info.enabledExtensionCount = 1;
                 device_create_info.pQueueCreateInfos = &queue_create_info;
                 device_create_info.queueCreateInfoCount = 1;

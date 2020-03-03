@@ -80,7 +80,7 @@ namespace game::core::api {
         auto extensions = vk::enumerateInstanceExtensionProperties(nullptr, {}, ctx.dispatcher);
 
         std::vector<const char*> enabled_extensions;
-        enabled_extensions.reserve(count + 1);
+        enabled_extensions.reserve(count + 2);
 
         for (u32 i = 0; i < count; ++i) {
             for (const auto& extension : extensions) {
@@ -97,6 +97,9 @@ namespace game::core::api {
 #ifdef GAME_DEBUG
         enabled_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
+#ifdef VK_API_VERSION_1_2
+        enabled_extensions.emplace_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+#endif
         return enabled_extensions;
     }
 
@@ -106,8 +109,8 @@ namespace game::core::api {
             application_info.applicationVersion = VK_API_VERSION_1_2;
             application_info.engineVersion = VK_API_VERSION_1_2;
 
-            application_info.pEngineName = "Snake Engine";
-            application_info.pApplicationName = "Snake Game";
+            application_info.pEngineName = "Game Engine";
+            application_info.pApplicationName = "Game";
         }
 
         auto enabled_exts = get_required_extensions(ctx);

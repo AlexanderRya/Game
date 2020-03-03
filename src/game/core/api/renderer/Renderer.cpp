@@ -5,6 +5,7 @@
 #include <game/core/api/VertexBuffer.hpp>
 #include <game/core/components/Mesh.hpp>
 #include <game/core/api/Pipeline.hpp>
+#include <game/core/Globals.hpp>
 #include <game/Constants.hpp>
 
 namespace game::core::api {
@@ -80,6 +81,8 @@ namespace game::core::api {
         command_buffer.setViewport(0, viewport, ctx.dispatcher);
         command_buffer.setScissor(0, scissor, ctx.dispatcher);
 
+        update_camera(graph);
+
         command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
 
         // Start mesh pass
@@ -128,5 +131,12 @@ namespace game::core::api {
         ctx.device.queue.presentKHR(present_info, ctx.dispatcher);
 
         current_frame = (current_frame + 1) % meta::frames_in_flight;
+    }
+
+    void Renderer::update_camera(RenderGraph& graph) {
+        auto projection = glm::perspective(glm::radians(60.f), static_cast<float>(ctx.swapchain.extent.width) / ctx.swapchain.extent.height, 0.1f, 100.f);
+        projection[1][1] *= -1;
+        graph.camera_data.pv_matrix = projection * camera.get_view_mat();
+        graph.camera_buffer[current_frame].write(&graph.camera_data, 1);
     }
 } // namespace game::core::api

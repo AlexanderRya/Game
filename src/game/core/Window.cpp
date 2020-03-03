@@ -1,4 +1,5 @@
 #include <game/core/api/VulkanContext.hpp>
+#include <game/core/Globals.hpp>
 #include <game/core/Window.hpp>
 #include <game/Logger.hpp>
 
@@ -33,6 +34,27 @@ namespace game::core {
             throw std::runtime_error("Failed window creation");
         }
 
+        glfwSetCursorPosCallback(window, [](GLFWwindow*, const double xpos, const double ypos) {
+            static double lastX = width / 2.0, lastY = height / 2.0;
+            static bool first = true;
+
+            if (first) {
+                lastX = xpos;
+                lastY = ypos;
+                first = false;
+            }
+
+            double xoffset = xpos - lastX;
+            double yoffset = lastY - ypos;
+
+            lastX = xpos;
+            lastY = ypos;
+
+            camera.process(xoffset, yoffset);
+        });
+
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         logger::info("Window successfully created with size: ", width, "x", height);
     }
 
@@ -54,5 +76,9 @@ namespace game::core {
 
     void Window::close() const {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    i32 Window::get_key(const i32 key) const {
+        return glfwGetKey(window, key);
     }
 } // namespace game::core

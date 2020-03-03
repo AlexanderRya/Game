@@ -10,6 +10,7 @@ include_directories(Game
         include
         external/glm
         external/glfw/include
+        external/VulkanMemoryAllocator/src
         ${Vulkan_INCLUDE_DIRS})
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -17,6 +18,11 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_CXX_STANDARD 20)
+
+set(VMA_SOURCES
+        external/VulkanMemoryAllocator/src/Common.cpp
+        external/VulkanMemoryAllocator/src/Common.h
+        external/VulkanMemoryAllocator/src/vk_mem_alloc.h)
 
 set(GAME_HEADERS
         include/game/Logger.hpp
@@ -42,9 +48,10 @@ set(GAME_HEADERS
         include/game/core/api/renderer/RenderGraph.hpp
         include/game/core/api/DescriptorSet.hpp
         include/game/Constants.hpp
-        include/game/core/api/MappedBuffer.hpp)
+        include/game/core/api/MappedBuffer.hpp include/game/core/components/Camera.hpp include/game/core/Globals.hpp)
 
 set(GAME_SOURCES
+        ${VMA_SOURCES}
         src/main.cpp
         src/game/Util.cpp
         src/game/core/Window.cpp
@@ -64,7 +71,8 @@ set(GAME_SOURCES
         src/game/core/api/Buffer.cpp
         src/game/core/components/Mesh.cpp
         src/game/core/api/DescriptorSet.cpp
-        src/game/core/api/MappedBuffer.cpp src/game/core/api/renderer/RenderGraph.cpp)
+        src/game/core/api/MappedBuffer.cpp
+        src/game/core/api/renderer/RenderGraph.cpp src/game/core/api/VulkanMemoryAllocator.cpp src/game/core/components/Camera.cpp)
 
 add_executable(Game
         ${GAME_HEADERS}

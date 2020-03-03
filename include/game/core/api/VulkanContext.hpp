@@ -5,6 +5,7 @@
 #include <game/Types.hpp>
 
 #include <vulkan/vulkan.hpp>
+#include <vk_mem_alloc.h>
 
 #include <vector>
 
@@ -32,7 +33,9 @@ namespace game::core::api {
     struct VulkanContext {
         Window* window{};
         vk::DispatchLoaderDynamic dispatcher{};
+        VmaVulkanFunctions vma_dispatcher{};
         vk::Instance instance{};
+        VmaAllocator allocator{};
         vk::DebugUtilsMessengerEXT validation{};
         vk::SurfaceKHR surface{};
         Device device{};
