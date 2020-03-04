@@ -27,8 +27,8 @@ namespace game::core {
             graph.pipelines[0] = api::make_generic_pipeline(create_info);
 
             graph.meshes.emplace_back(components::Mesh{
-                .vertex_buffer_id = 0,
-                .vertex_count = 3
+                .vertex_count = 3,
+                .vertex_buffer_id = 0
             });
         }
 

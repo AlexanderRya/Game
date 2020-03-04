@@ -63,7 +63,7 @@ namespace game::core::api {
             allocator_create_info.pDeviceMemoryCallbacks = nullptr;
             allocator_create_info.frameInUseCount = 1;
             allocator_create_info.preferredLargeHeapBlockSize = 0;
-            allocator_create_info.vulkanApiVersion = VK_API_VERSION_1_2;
+            allocator_create_info.vulkanApiVersion = VK_API_VERSION_1_0;
         }
 
         VmaAllocator allocator{};
@@ -86,7 +86,7 @@ namespace game::core::api {
         ctx.instance = make_instance(ctx);
         ctx.dispatcher.init(static_cast<VkInstance>(ctx.instance), ctx.dispatcher.vkGetInstanceProcAddr);
         load_vma(ctx);
-#if GAME_DEBUG
+#if defined(GAME_DEBUG)
         logger::warning("Vulkan debug mode active, performance may be lower than usual");
         ctx.validation = install_validation_layers(ctx);
 #endif

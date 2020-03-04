@@ -89,7 +89,7 @@ namespace game::core::api {
         command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graph.pipelines[0].handle, ctx.dispatcher);
 
         for (const auto& mesh : graph.meshes) {
-            command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
+            command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].buffer.handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eGraphics,
                 graph.layouts[meta::PipelineLayoutType::MeshGeneric].pipeline,

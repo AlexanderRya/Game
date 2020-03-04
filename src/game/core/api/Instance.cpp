@@ -97,9 +97,6 @@ namespace game::core::api {
 #ifdef GAME_DEBUG
         enabled_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
-#ifdef VK_API_VERSION_1_2
-        enabled_extensions.emplace_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-#endif
         return enabled_extensions;
     }
 

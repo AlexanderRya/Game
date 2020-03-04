@@ -5,7 +5,7 @@
 #include <game/core/api/Buffer.hpp>
 
 namespace game::core::api {
-    vk::Buffer make_buffer(const usize size, const vk::BufferUsageFlags& usage, const api::VulkanContext& ctx) {
+    Buffer vma_make_buffer(const usize size, const vk::BufferUsageFlags& usage, const VmaMemoryUsage memory_usage, const VmaAllocationCreateFlags alloc_flags, const api::VulkanContext& ctx) {
         vk::BufferCreateInfo buffer_create_info{}; {
             buffer_create_info.size = size;
             buffer_create_info.queueFamilyIndexCount = 1;
@@ -14,7 +14,27 @@ namespace game::core::api {
             buffer_create_info.sharingMode = vk::SharingMode::eExclusive;
         }
 
-        return ctx.device.logical.createBuffer(buffer_create_info, nullptr, ctx.dispatcher);
+        VmaAllocationCreateInfo allocation_create_info{}; {
+            allocation_create_info.flags = alloc_flags;
+            allocation_create_info.requiredFlags = 0;
+            allocation_create_info.preferredFlags = 0;
+            allocation_create_info.memoryTypeBits = 0;
+            allocation_create_info.pool = nullptr;
+            allocation_create_info.pUserData = nullptr;
+            allocation_create_info.usage = memory_usage;
+        }
+
+        Buffer buffer{};
+
+        vmaCreateBuffer(
+            ctx.allocator,
+            reinterpret_cast<VkBufferCreateInfo*>(&buffer_create_info),
+            &allocation_create_info,
+            reinterpret_cast<VkBuffer*>(&buffer.handle),
+            &buffer.allocation,
+            nullptr);
+
+        return buffer;
     }
 
     vk::DeviceMemory allocate_memory(const vk::Buffer& buffer, const vk::MemoryPropertyFlags& flags, const api::VulkanContext& ctx) {
@@ -31,6 +51,18 @@ namespace game::core::api {
         ctx.device.logical.bindBufferMemory(buffer, memory, 0, ctx.dispatcher);
 
         return memory;
+    }
+
+    vk::Buffer make_buffer(const usize size, const vk::BufferUsageFlags& usage, const VulkanContext& ctx) {
+        vk::BufferCreateInfo buffer_create_info{}; {
+            buffer_create_info.size = size;
+            buffer_create_info.queueFamilyIndexCount = 1;
+            buffer_create_info.pQueueFamilyIndices = &ctx.device.queue_family;
+            buffer_create_info.usage = usage;
+            buffer_create_info.sharingMode = vk::SharingMode::eExclusive;
+        }
+
+        return ctx.device.logical.createBuffer(buffer_create_info, nullptr, ctx.dispatcher);
     }
 
     void copy_buffer(const vk::Buffer& src, const vk::Buffer& dst, const usize size, const VulkanContext& ctx) {
