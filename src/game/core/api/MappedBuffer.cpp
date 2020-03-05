@@ -11,16 +11,20 @@ namespace game::core::api {
         type_size = info.type_size;
 
         // Arbitrary number
-        allocate(4);
+        allocate(1);
     }
 
     void SingleMappedBuffer::allocate(const usize size) {
         current_size = size;
 
-        buffer = api::make_buffer(size * type_size, buffer_usage, *ctx);
-        memory = api::allocate_memory(buffer, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent, *ctx);
+        buffer = vma_make_buffer(
+            size * type_size,
+            buffer_usage,
+            VmaMemoryUsage::VMA_MEMORY_USAGE_CPU_ONLY,
+            VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_WITHIN_BUDGET_BIT,
+            *ctx);
 
-        mapped = ctx->device.logical.mapMemory(memory, 0, size * type_size, {}, ctx->dispatcher);
+        vmaMapMemory(ctx->allocator, buffer.allocation, &mapped);
     }
 
     void SingleMappedBuffer::write(const void* data, const usize size) {
@@ -34,15 +38,14 @@ namespace game::core::api {
     }
 
     void SingleMappedBuffer::deallocate() {
-        ctx->device.logical.unmapMemory(memory, ctx->dispatcher);
+        vmaUnmapMemory(ctx->allocator, buffer.allocation);
 
-        ctx->device.logical.freeMemory(memory, nullptr, ctx->dispatcher);
-        ctx->device.logical.destroyBuffer(buffer, nullptr, ctx->dispatcher);
+        vmaDestroyBuffer(ctx->allocator, static_cast<VkBuffer>(buffer.handle), buffer.allocation);
     }
 
     vk::DescriptorBufferInfo SingleMappedBuffer::get_info() const {
         vk::DescriptorBufferInfo info{}; {
-            info.buffer = buffer;
+            info.buffer = buffer.handle;
             info.offset = static_cast<vk::DeviceSize>(0);
             info.range = current_size * type_size;
         }

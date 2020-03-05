@@ -1,6 +1,7 @@
 #ifndef GAME_MAPPEDBUFFER_HPP
 #define GAME_MAPPEDBUFFER_HPP
 
+#include <game/core/api/Buffer.hpp>
 #include <game/Forwards.hpp>
 #include <game/Types.hpp>
 
@@ -29,8 +30,7 @@ namespace game::core::api {
         const api::VulkanContext* ctx{};
 
         vk::BufferUsageFlags buffer_usage;
-        vk::Buffer buffer{};
-        vk::DeviceMemory memory{};
+        api::Buffer buffer{};
 
         void* mapped{};
 

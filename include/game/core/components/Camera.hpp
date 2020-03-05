@@ -12,8 +12,8 @@
 
 namespace game::core::components {
     struct Camera {
-        static constexpr f32 speed = 5.f;
-        static constexpr f32 sensitivity = 8.0e-2f;
+        static constexpr f32 speed = 0.6f;
+        static constexpr f32 sensitivity = 5.0e-2f;
 
         f64 yaw;
         f64 pitch;

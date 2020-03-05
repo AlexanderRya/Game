@@ -1,4 +1,5 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
+#include <game/core/components/Texture.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/Constants.hpp>
 
@@ -23,14 +24,14 @@ namespace game::core::api {
         }
 
         for (auto& mesh : meshes) {
-            mesh.build(ctx, layouts[meta::PipelineLayoutType::MeshGeneric]);
-            api::DescriptorSet::WriteInfo write_info{}; {
-                write_info.buffer_info = camera_buffer.get_info();
-                write_info.binding = static_cast<u32>(meta::PipelineBinding::Camera);
-                write_info.type = vk::DescriptorType::eUniformBuffer;
+            components::Mesh::BuildInfo info{}; {
+                info.ctx = &ctx;
+                info.layout = layouts[meta::PipelineLayoutType::MeshGeneric].set;
+                info.camera_buffer = &camera_buffer;
+                info.texture = &textures[mesh.texture_idx];
             }
 
-            mesh.descriptor_set.write(write_info);
+            mesh.build(info);
         }
     }
 } // namespace game::core::api

@@ -1,5 +1,6 @@
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/Swapchain.hpp>
+#include <game/core/api/Image.hpp>
 #include <game/core/Window.hpp>
 #include <game/Logger.hpp>
 #include <game/Types.hpp>
@@ -67,53 +68,37 @@ namespace game::core::api {
         return vk::PresentModeKHR::eFifo;
     }
 
-    static inline void get_swapchain(const VulkanContext& ctx, Swapchain& details) {
+    static inline void get_swapchain(const VulkanContext& ctx, Swapchain& swapchain) {
         vk::SwapchainCreateInfoKHR swapchain_create_info{}; {
             swapchain_create_info.surface = ctx.surface;
-            swapchain_create_info.minImageCount = details.image_count;
-            swapchain_create_info.imageFormat = details.format.format;
-            swapchain_create_info.imageColorSpace = details.format.colorSpace;
-            swapchain_create_info.imageExtent = details.extent;
-            swapchain_create_info.preTransform = details.surface_transform;
+            swapchain_create_info.minImageCount = swapchain.image_count;
+            swapchain_create_info.imageFormat = swapchain.format.format;
+            swapchain_create_info.imageColorSpace = swapchain.format.colorSpace;
+            swapchain_create_info.imageExtent = swapchain.extent;
+            swapchain_create_info.preTransform = swapchain.surface_transform;
             swapchain_create_info.imageArrayLayers = 1;
             swapchain_create_info.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
             swapchain_create_info.imageSharingMode = vk::SharingMode::eExclusive;
             swapchain_create_info.queueFamilyIndexCount = 1;
             swapchain_create_info.pQueueFamilyIndices = &ctx.device.queue_family;
             swapchain_create_info.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
-            swapchain_create_info.presentMode = details.present_mode;
+            swapchain_create_info.presentMode = swapchain.present_mode;
             swapchain_create_info.clipped = true;
             swapchain_create_info.oldSwapchain = nullptr;
         }
 
-        details.handle = ctx.device.logical.createSwapchainKHR(swapchain_create_info, nullptr, ctx.dispatcher);
+        swapchain.handle = ctx.device.logical.createSwapchainKHR(swapchain_create_info, nullptr, ctx.dispatcher);
 
         logger::info("Swapchain successfully created");
     }
 
-    static inline void create_images(const VulkanContext& ctx, Swapchain& details) {
-        details.images = ctx.device.logical.getSwapchainImagesKHR(details.handle, ctx.dispatcher);
+    static inline void create_images(const VulkanContext& ctx, Swapchain& swapchain) {
+        swapchain.images = ctx.device.logical.getSwapchainImagesKHR(swapchain.handle, ctx.dispatcher);
 
-        vk::ImageViewCreateInfo image_view_create_info{}; {
-            image_view_create_info.format = details.format.format;
-            image_view_create_info.components.r = vk::ComponentSwizzle::eIdentity;
-            image_view_create_info.components.g = vk::ComponentSwizzle::eIdentity;
-            image_view_create_info.components.b = vk::ComponentSwizzle::eIdentity;
-            image_view_create_info.components.a = vk::ComponentSwizzle::eIdentity;
-            image_view_create_info.viewType = vk::ImageViewType::e2D;
-            image_view_create_info.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-            image_view_create_info.subresourceRange.baseMipLevel = 0;
-            image_view_create_info.subresourceRange.levelCount = 1;
-            image_view_create_info.subresourceRange.baseArrayLayer = 0;
-            image_view_create_info.subresourceRange.layerCount = 1;
-        }
+        swapchain.image_views.reserve(swapchain.image_count);
 
-        details.image_views.reserve(details.image_count);
-
-        for (const auto& image : details.images) {
-            image_view_create_info.image = image;
-
-            details.image_views.emplace_back(ctx.device.logical.createImageView(image_view_create_info, nullptr, ctx.dispatcher));
+        for (const auto& image : swapchain.images) {
+            swapchain.image_views.emplace_back(api::make_image_view(ctx, image, swapchain.format.format));
         }
 
         logger::info("Swapchain images successfully created");
@@ -122,18 +107,18 @@ namespace game::core::api {
     Swapchain make_swapchain(const Window* window, const VulkanContext& ctx) {
         auto capabilities = ctx.device.physical.getSurfaceCapabilitiesKHR(ctx.surface, ctx.dispatcher);
 
-        Swapchain details{};
+        Swapchain swapchain{};
 
-        details.image_count = get_image_count(capabilities);
-        details.extent = get_extent(window, capabilities);
-        details.format = get_format(ctx);
-        details.present_mode = get_present_mode(ctx);
+        swapchain.image_count = get_image_count(capabilities);
+        swapchain.extent = get_extent(window, capabilities);
+        swapchain.format = get_format(ctx);
+        swapchain.present_mode = get_present_mode(ctx);
 
-        details.surface_transform = capabilities.currentTransform;
+        swapchain.surface_transform = capabilities.currentTransform;
 
-        get_swapchain(ctx, details);
-        create_images(ctx, details);
+        get_swapchain(ctx, swapchain);
+        create_images(ctx, swapchain);
 
-        return details;
+        return swapchain;
     }
 } // namespace game::core::api

@@ -8,6 +8,7 @@ add_subdirectory(external/glm)
 
 include_directories(Game
         include
+        external/stb
         external/glm
         external/glfw/include
         external/VulkanMemoryAllocator/src
@@ -19,12 +20,19 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(VMA_SOURCES
-        external/VulkanMemoryAllocator/src/Common.cpp
-        external/VulkanMemoryAllocator/src/Common.h
+set(STB_HEADERS
+        external/stb/stb.h
+        external/stb/stb_image.h)
+
+set(STB_SOURCES
+        src/game/STBImpl.cpp)
+
+set(VMA_HEADERS
         external/VulkanMemoryAllocator/src/vk_mem_alloc.h)
 
 set(GAME_HEADERS
+        ${STB_HEADERS}
+        ${VMA_HEADERS}
         include/game/Logger.hpp
         include/game/Util.hpp
         include/game/Types.hpp
@@ -48,10 +56,15 @@ set(GAME_HEADERS
         include/game/core/api/renderer/RenderGraph.hpp
         include/game/core/api/DescriptorSet.hpp
         include/game/Constants.hpp
-        include/game/core/api/MappedBuffer.hpp include/game/core/components/Camera.hpp include/game/core/Globals.hpp)
+        include/game/core/api/MappedBuffer.hpp
+        include/game/core/components/Camera.hpp
+        include/game/core/Globals.hpp
+        include/game/core/components/Texture.hpp
+        include/game/core/api/Image.hpp
+        include/game/core/api/Sampler.hpp)
 
 set(GAME_SOURCES
-        ${VMA_SOURCES}
+        ${STB_SOURCES}
         src/main.cpp
         src/game/Util.cpp
         src/game/core/Window.cpp
@@ -72,13 +85,22 @@ set(GAME_SOURCES
         src/game/core/components/Mesh.cpp
         src/game/core/api/DescriptorSet.cpp
         src/game/core/api/MappedBuffer.cpp
-        src/game/core/api/renderer/RenderGraph.cpp src/game/core/api/VulkanMemoryAllocator.cpp src/game/core/components/Camera.cpp)
+        src/game/core/api/renderer/RenderGraph.cpp
+        src/game/core/api/VulkanMemoryAllocator.cpp
+        src/game/core/components/Camera.cpp
+        src/game/core/api/Image.cpp
+        src/game/core/components/Texture.cpp
+        src/game/core/api/Sampler.cpp)
 
 add_executable(Game
         ${GAME_HEADERS}
         ${GAME_SOURCES})
 
-target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+if (WIN32)
+    target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+elseif(UNIX)
+    target_compile_options(Game PRIVATE -std=c++20 -O3 -Wno-everything)
+endif()
 
 if (WIN32)
     target_compile_definitions(Game PRIVATE _CRT_SECURE_NO_WARNINGS)

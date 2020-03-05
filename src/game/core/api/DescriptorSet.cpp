@@ -23,37 +23,64 @@ namespace game::core::api {
         std::vector<vk::WriteDescriptorSet> writes;
         writes.resize(write_info.size());
 
-        for (usize j = 0; j < meta::frames_in_flight; ++j) {
-            for (usize i = 0; i < write_info.size(); ++i) {
-                writes[i].descriptorType = write_info[i].type;
-                writes[i].dstBinding = write_info[i].binding;
-                writes[i].descriptorCount = 1;
-                writes[i].dstArrayElement = 0;
-                writes[i].dstSet = descriptor_sets[j];
-                writes[i].pImageInfo = nullptr;
-                writes[i].pTexelBufferView = nullptr;
-                writes[i].pBufferInfo = &write_info[i].buffer_info[j];
-
-                ctx->device.logical.updateDescriptorSets(writes, nullptr, ctx->dispatcher);
+        for (usize i = 0; i < meta::frames_in_flight; ++i) {
+            for (usize j = 0; j < write_info.size(); ++j) {
+                writes[j].descriptorType = write_info[j].type;
+                writes[j].dstBinding = write_info[j].binding;
+                writes[j].descriptorCount = 1;
+                writes[j].dstArrayElement = 0;
+                writes[j].dstSet = descriptor_sets[i];
+                writes[j].pImageInfo = nullptr;
+                writes[j].pTexelBufferView = nullptr;
+                if (!write_info[j].buffer_info.empty()) {
+                    writes[j].pBufferInfo = &write_info[j].buffer_info[i];
+                } else {
+                    writes[j].pImageInfo = &write_info[j].image_info;
+                }
             }
+
+            ctx->device.logical.updateDescriptorSets(writes, nullptr, ctx->dispatcher);
         }
     }
 
     void DescriptorSet::write(const WriteInfo& write_info) {
         for (usize i = 0; i < meta::frames_in_flight; ++i) {
-            vk::WriteDescriptorSet write{}; {
-                write.descriptorType = write_info.type;
-                write.dstBinding = write_info.binding;
-                write.descriptorCount = 1;
-                write.dstArrayElement = 0;
-                write.dstSet = descriptor_sets[i];
-                write.pImageInfo = nullptr;
-                write.pTexelBufferView = nullptr;
-                write.pBufferInfo = &write_info.buffer_info[i];
+                vk::WriteDescriptorSet write{}; {
+                    write.descriptorType = write_info.type;
+                    write.dstBinding = write_info.binding;
+                    write.descriptorCount = 1;
+                    write.dstArrayElement = 0;
+                    write.dstSet = descriptor_sets[i];
+                    write.pImageInfo = nullptr;
+                    write.pTexelBufferView = nullptr;
+                if (!write_info.buffer_info.empty()) {
+                    write.pBufferInfo = &write_info.buffer_info[i];
+                } else {
+                    write.pImageInfo = &write_info.image_info;
+                }
             }
 
             ctx->device.logical.updateDescriptorSets(write, nullptr, ctx->dispatcher);
         }
+    }
+
+    void DescriptorSet::write_at(const usize idx, const DescriptorSet::WriteInfo& write_info) {
+        vk::WriteDescriptorSet write{}; {
+            write.descriptorType = write_info.type;
+            write.dstBinding = write_info.binding;
+            write.descriptorCount = 1;
+            write.dstArrayElement = 0;
+            write.dstSet = descriptor_sets[idx];
+            write.pImageInfo = nullptr;
+            write.pTexelBufferView = nullptr;
+            if (!write_info.buffer_info.empty()) {
+                write.pBufferInfo = &write_info.buffer_info[idx];
+            } else {
+                write.pImageInfo = &write_info.image_info;
+            }
+        }
+
+        ctx->device.logical.updateDescriptorSets(write, nullptr, ctx->dispatcher);
     }
 
     vk::DescriptorSet DescriptorSet::operator [](const usize idx) const {

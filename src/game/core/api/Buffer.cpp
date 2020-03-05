@@ -37,7 +37,19 @@ namespace game::core::api {
         return buffer;
     }
 
-    vk::DeviceMemory allocate_memory(const vk::Buffer& buffer, const vk::MemoryPropertyFlags& flags, const api::VulkanContext& ctx) {
+    vk::Buffer make_buffer(const VulkanContext& ctx, const usize size, const vk::BufferUsageFlags usage) {
+        vk::BufferCreateInfo buffer_create_info{}; {
+            buffer_create_info.size = size;
+            buffer_create_info.queueFamilyIndexCount = 1;
+            buffer_create_info.pQueueFamilyIndices = &ctx.device.queue_family;
+            buffer_create_info.usage = usage;
+            buffer_create_info.sharingMode = vk::SharingMode::eExclusive;
+        }
+
+        return ctx.device.logical.createBuffer(buffer_create_info, nullptr, ctx.dispatcher);
+    }
+
+    vk::DeviceMemory allocate_memory(const VulkanContext& ctx, const vk::Buffer buffer, const vk::MemoryPropertyFlags flags) {
         const auto memory_requirements = ctx.device.logical.getBufferMemoryRequirements(buffer, ctx.dispatcher);
 
         vk::MemoryAllocateInfo memory_allocate_info{}; {
@@ -53,26 +65,24 @@ namespace game::core::api {
         return memory;
     }
 
-    vk::Buffer make_buffer(const usize size, const vk::BufferUsageFlags& usage, const VulkanContext& ctx) {
-        vk::BufferCreateInfo buffer_create_info{}; {
-            buffer_create_info.size = size;
-            buffer_create_info.queueFamilyIndexCount = 1;
-            buffer_create_info.pQueueFamilyIndices = &ctx.device.queue_family;
-            buffer_create_info.usage = usage;
-            buffer_create_info.sharingMode = vk::SharingMode::eExclusive;
+    vk::DeviceMemory allocate_memory(const VulkanContext& ctx, const vk::Image image, const vk::MemoryPropertyFlags flags) {
+        const auto memory_requirements = ctx.device.logical.getImageMemoryRequirements(image, ctx.dispatcher);
+
+        vk::MemoryAllocateInfo memory_allocate_info{}; {
+            memory_allocate_info.allocationSize = memory_requirements.size;
+            memory_allocate_info.memoryTypeIndex = api::find_memory_type(
+                ctx, memory_requirements.memoryTypeBits, flags);
         }
 
-        return ctx.device.logical.createBuffer(buffer_create_info, nullptr, ctx.dispatcher);
+        auto memory = ctx.device.logical.allocateMemory(memory_allocate_info, nullptr, ctx.dispatcher);
+
+        ctx.device.logical.bindImageMemory(image, memory, 0, ctx.dispatcher);
+
+        return memory;
     }
 
-    void copy_buffer(const vk::Buffer& src, const vk::Buffer& dst, const usize size, const VulkanContext& ctx) {
+    void copy_buffer(const VulkanContext& ctx, const vk::Buffer src, vk::Buffer dst, const usize size) {
         auto command_buffer = begin_transient(ctx); {
-            vk::CommandBufferBeginInfo begin_info{}; {
-                begin_info.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-            }
-
-            command_buffer.begin(begin_info, ctx.dispatcher);
-
             vk::BufferCopy region{}; {
                 region.size = size;
                 region.srcOffset = 0;
@@ -81,9 +91,33 @@ namespace game::core::api {
 
             command_buffer.copyBuffer(src, dst, region, ctx.dispatcher);
 
-            command_buffer.end(ctx.dispatcher);
+            end_transient(ctx, command_buffer);
+        }
+    }
 
-            end_transient(command_buffer, ctx);
+    void copy_buffer_to_image(const VulkanContext& ctx, const vk::Buffer buffer, vk::Image image, const u32 width, const u32 height) {
+        auto command_buffer = begin_transient(ctx); {
+            vk::BufferImageCopy region{}; {
+                region.bufferOffset = 0;
+                region.bufferRowLength = 0;
+                region.bufferImageHeight = 0;
+
+                region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+                region.imageSubresource.mipLevel = 0;
+                region.imageSubresource.baseArrayLayer = 0;
+                region.imageSubresource.layerCount = 1;
+
+                region.imageOffset = { { 0, 0, 0 } };
+                region.imageExtent = { {
+                    width,
+                    height,
+                    1
+                } };
+            }
+
+            command_buffer.copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, region, ctx.dispatcher);
+
+            end_transient(ctx, command_buffer);
         }
     }
 } // namespace game::core::api

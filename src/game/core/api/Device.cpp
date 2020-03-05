@@ -11,8 +11,11 @@ namespace game::core::api {
 
         for (const auto& device : physical_devices) {
             auto device_properties = device.getProperties(ctx.dispatcher);
-            if (device_properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu ||
-                device_properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu) {
+            auto device_features = device.getFeatures(ctx.dispatcher);
+
+            if ((device_properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu ||
+                device_properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu) &&
+                device_features.samplerAnisotropy) {
 
                 logger::info("Selected physical device: ", device_properties.deviceName);
                 return device;
@@ -51,11 +54,16 @@ namespace game::core::api {
                 queue_create_info.pQueuePriorities = priorities;
             }
 
+            vk::PhysicalDeviceFeatures features{}; {
+                features.samplerAnisotropy = true;
+            }
+
             vk::DeviceCreateInfo device_create_info{}; {
                 device_create_info.ppEnabledExtensionNames = enabled_exts;
                 device_create_info.enabledExtensionCount = 1;
                 device_create_info.pQueueCreateInfos = &queue_create_info;
                 device_create_info.queueCreateInfoCount = 1;
+                device_create_info.pEnabledFeatures = &features;
             }
 
             return physical_device.createDevice(device_create_info, nullptr, dispatcher);

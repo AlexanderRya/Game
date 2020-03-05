@@ -30,7 +30,7 @@ namespace game::core::api {
             ctx);
 
         // Copy to device local
-        api::copy_buffer(temp_buffer.handle, vertex_buffer.buffer.handle, vertices.size() * sizeof(Vertex), ctx);
+        api::copy_buffer(ctx, temp_buffer.handle, vertex_buffer.buffer.handle, vertices.size() * sizeof(Vertex));
 
         vmaDestroyBuffer(ctx.allocator, temp_buffer.handle, temp_buffer.allocation);
 

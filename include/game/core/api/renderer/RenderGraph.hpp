@@ -21,7 +21,9 @@ namespace game::core::api {
 
         std::unordered_map<u64, api::Pipeline> pipelines;
         std::unordered_map<meta::PipelineLayoutType, api::PipelineLayout> layouts;
+        std::unordered_map<meta::SamplerType, vk::Sampler> samplers;
 
+        std::vector<components::Texture> textures;
         std::vector<components::Mesh> meshes;
 
         void build(const VulkanContext&);

@@ -29,10 +29,18 @@ namespace game::core::api {
 
         auto command_buffers = ctx.device.logical.allocateCommandBuffers(command_buffer_allocate_info, ctx.dispatcher);
 
+        vk::CommandBufferBeginInfo begin_info{}; {
+            begin_info.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+        }
+
+        command_buffers[0].begin(begin_info, ctx.dispatcher);
+
         return command_buffers[0];
     }
 
-    void end_transient(const vk::CommandBuffer command_buffer, const VulkanContext& ctx) {
+    void end_transient(const VulkanContext& ctx, const vk::CommandBuffer command_buffer) {
+        command_buffer.end(ctx.dispatcher);
+
         vk::SubmitInfo submit_info{}; {
             submit_info.commandBufferCount = 1;
             submit_info.pCommandBuffers = &command_buffer;

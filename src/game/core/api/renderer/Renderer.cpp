@@ -28,6 +28,7 @@ namespace game::core::api {
 
     void Renderer::init_rendering_data() {
         vertex_buffers[0] = api::make_vertex_buffer(components::generate_triangle_geometry(), ctx);
+        vertex_buffers[1] = api::make_vertex_buffer(components::generate_quad_geometry(), ctx);
     }
 
     void Renderer::acquire_frame() {
@@ -82,6 +83,7 @@ namespace game::core::api {
         command_buffer.setScissor(0, scissor, ctx.dispatcher);
 
         update_camera(graph);
+        update_meshes(graph.meshes);
 
         command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
 
@@ -134,9 +136,31 @@ namespace game::core::api {
     }
 
     void Renderer::update_camera(RenderGraph& graph) {
-        auto projection = glm::perspective(glm::radians(60.f), static_cast<float>(ctx.swapchain.extent.width) / ctx.swapchain.extent.height, 0.1f, 100.f);
+        auto projection = glm::perspective(
+            glm::radians(60.f),
+            static_cast<float>(ctx.swapchain.extent.width) / ctx.swapchain.extent.height,
+            0.01f, 100.f);
         projection[1][1] *= -1;
         graph.camera_data.pv_matrix = projection * camera.get_view_mat();
         graph.camera_buffer[current_frame].write(&graph.camera_data, 1);
+    }
+
+    void Renderer::update_meshes(std::vector<components::Mesh>& meshes) {
+        for (auto& mesh : meshes) {
+            mesh.update(mesh);
+            if (mesh.instance_buffer[current_frame].size() < mesh.instances.size()) {
+                mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
+
+                api::DescriptorSet::WriteInfo write_info{}; {
+                    write_info.binding = 1;
+                    write_info.buffer_info = mesh.instance_buffer.get_info();
+                    write_info.type = vk::DescriptorType::eStorageBuffer;
+                }
+
+                mesh.descriptor_set.write_at(current_frame, write_info);
+            } else {
+                mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
+            }
+        }
     }
 } // namespace game::core::api

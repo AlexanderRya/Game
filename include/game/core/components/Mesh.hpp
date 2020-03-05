@@ -11,17 +11,29 @@
 
 namespace game::core::components {
     struct Mesh {
+        struct BuildInfo {
+            const api::VulkanContext* ctx{};
+
+            vk::DescriptorSetLayout layout{};
+            const api::MappedBuffer* camera_buffer{};
+
+            const Texture* texture{};
+        };
         u64 vertex_count{};
         u64 vertex_buffer_id{};
+        u64 texture_idx{};
 
-        std::vector<Instance> instance_data{};
+        void (*update)(Mesh&);
+
+        std::vector<Instance> instances{};
         api::DescriptorSet descriptor_set{};
         api::MappedBuffer instance_buffer{};
 
-        void build(const api::VulkanContext&, const api::PipelineLayout&);
+        void build(const BuildInfo&);
     };
 
     [[nodiscard]] std::vector<Vertex> generate_triangle_geometry();
+    [[nodiscard]] std::vector<Vertex> generate_quad_geometry();
 }
 
 #endif //GAME_MESH_HPP

@@ -34,7 +34,7 @@ namespace game {
     };
 
     struct Instance {
-        glm::mat4 instances;
+        glm::mat4 instance;
     };
 } // namespace game
 
