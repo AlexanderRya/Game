@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_FORCE_RADIANS
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
@@ -34,7 +36,7 @@ namespace game {
     };
 
     struct Instance {
-        glm::mat4 instance;
+        glm::mat4 model;
     };
 } // namespace game
 

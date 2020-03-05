@@ -21,7 +21,7 @@ namespace game::core {
 
             graph.samplers[meta::SamplerType::Default] = api::make_default_sampler(context);
 
-            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/test.png");
+            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/test.jpg");
 
             api::Pipeline::CreateInfo create_info{}; {
                 create_info.ctx = &context;
@@ -30,19 +30,22 @@ namespace game::core {
                 create_info.layout = graph.layouts[meta::PipelineLayoutType::MeshGeneric];
             }
 
-            graph.pipelines[0] = api::make_generic_pipeline(create_info);
+            graph.pipelines[meta::PipelineType::MeshGeneric] = api::make_generic_pipeline(create_info);
 
             graph.meshes.emplace_back(components::Mesh{
-                .vertex_count = 12,
+                .vertex_count = 6,
                 .vertex_buffer_id = 1,
                 .texture_idx = 0,
                 .update = [](components::Mesh& mesh) {
-                    mesh.instances[0].instance = glm::mat4(1.0f);
+                    mesh.instances.emplace_back();
+                    mesh.instances.back().model = glm::translate(mesh.instances.end()[-2].model, glm::vec3{ 0.0f, 0.0f, -0.5f });
                 }
             });
         }
 
         graph.build(context);
+
+        window.set_user_pointer(&graph);
 
         while (!window.should_close()) {
             f32 current_frame = glfwGetTime();

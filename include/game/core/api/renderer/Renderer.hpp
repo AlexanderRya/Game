@@ -22,6 +22,7 @@ namespace game::core::api {
         // Drawing stuff
         std::unordered_map<u64, api::VertexBuffer> vertex_buffers;
 
+        u32 frames_rendered{};
         u32 image_index{};
         u32 current_frame{};
 

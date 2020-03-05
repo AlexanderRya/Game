@@ -22,6 +22,7 @@ namespace game::core {
 
         void poll_events() const;
         void close() const;
+        void set_user_pointer(void*);
         [[nodiscard]] bool should_close() const;
         [[nodiscard]] i32 get_key(const i32) const;
     };

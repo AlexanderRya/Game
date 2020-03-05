@@ -88,9 +88,9 @@ namespace game::core::api {
         command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
 
         // Start mesh pass
-        command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graph.pipelines[0].handle, ctx.dispatcher);
+        command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graph.pipelines[meta::PipelineType::MeshGeneric].handle, ctx.dispatcher);
 
-        for (const auto& mesh : graph.meshes) {
+        for (auto& mesh : graph.meshes) {
             command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].buffer.handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eGraphics,
@@ -99,7 +99,11 @@ namespace game::core::api {
                 mesh.descriptor_set[current_frame],
                 nullptr,
                 ctx.dispatcher);
-            command_buffer.draw(mesh.vertex_count, 1, 0, 0, ctx.dispatcher);
+            command_buffer.draw(mesh.vertex_count, mesh.instances.size(), 0, 0, ctx.dispatcher);
+
+            if (mesh.update) { // Debug stuff
+                mesh.update(mesh);
+            }
         }
 
         command_buffer.endRenderPass(ctx.dispatcher);
@@ -132,6 +136,7 @@ namespace game::core::api {
 
         ctx.device.queue.presentKHR(present_info, ctx.dispatcher);
 
+        ++frames_rendered;
         current_frame = (current_frame + 1) % meta::frames_in_flight;
     }
 
@@ -147,12 +152,11 @@ namespace game::core::api {
 
     void Renderer::update_meshes(std::vector<components::Mesh>& meshes) {
         for (auto& mesh : meshes) {
-            mesh.update(mesh);
-            if (mesh.instance_buffer[current_frame].size() < mesh.instances.size()) {
+            if (mesh.instance_buffer[current_frame].size() != mesh.instances.size()) {
                 mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
 
                 api::DescriptorSet::WriteInfo write_info{}; {
-                    write_info.binding = 1;
+                    write_info.binding = static_cast<u32>(meta::PipelineBinding::Instance);
                     write_info.buffer_info = mesh.instance_buffer.get_info();
                     write_info.type = vk::DescriptorType::eStorageBuffer;
                 }

@@ -1,10 +1,11 @@
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+#include <game/core/api/renderer/RenderGraph.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/Globals.hpp>
 #include <game/core/Window.hpp>
 #include <game/Logger.hpp>
-
-#include <vulkan/vulkan.hpp>
-#include <GLFW/glfw3.h>
 
 #include <stdexcept>
 
@@ -53,7 +54,17 @@ namespace game::core {
             camera.process(xoffset, yoffset);
         });
 
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
+            if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+                auto& graph_ptr = *reinterpret_cast<api::RenderGraph*>(glfwGetWindowUserPointer(window));
+                auto& mesh = graph_ptr.meshes[0];
+
+                mesh.instances.emplace_back();
+                mesh.instances.back().model = glm::translate(mesh.instances.end()[-2].model, glm::vec3{ 0.0f, 0.0f, -0.5f });
+            }
+        });
+
+        // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         logger::info("Window successfully created with size: ", width, "x", height);
     }
@@ -68,6 +79,10 @@ namespace game::core {
 
     void Window::poll_events() const {
         glfwPollEvents();
+    }
+
+    void Window::set_user_pointer(void* ptr) {
+        glfwSetWindowUserPointer(window, ptr);
     }
 
     bool Window::should_close() const {

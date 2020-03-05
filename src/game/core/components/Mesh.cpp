@@ -7,7 +7,7 @@ namespace game::core::components {
         instances = {};
         instances.resize(1);
 
-        instances[0].instance = glm::mat4(1.0f);
+        instances[0].model = glm::mat4(1.0f);
 
         /* Instance descriptor creation*/ {
             api::DescriptorSet::CreateInfo create_info{}; {

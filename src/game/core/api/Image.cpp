@@ -101,6 +101,12 @@ namespace game::core::api {
 
                 source_stage = vk::PipelineStageFlagBits::eTransfer;
                 destination_stage = vk::PipelineStageFlagBits::eFragmentShader;
+            } else if (old_layout == vk::ImageLayout::eUndefined && new_layout == vk::ImageLayout::eDepthStencilAttachmentOptimal) {
+                image_memory_barrier.srcAccessMask = {};
+                image_memory_barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+
+                source_stage = vk::PipelineStageFlagBits::eTopOfPipe;
+                destination_stage = vk::PipelineStageFlagBits::eEarlyFragmentTests;
             } else {
                 throw std::invalid_argument("Unsupported layout transition");
             }

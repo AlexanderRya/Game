@@ -7,15 +7,15 @@
 
 namespace game::core::api {
     vk::RenderPass make_default_render_pass(const VulkanContext& ctx) {
-        vk::AttachmentDescription attachment_description{}; {
-            attachment_description.format = ctx.swapchain.format.format;
-            attachment_description.samples = vk::SampleCountFlagBits::e1;
-            attachment_description.loadOp = vk::AttachmentLoadOp::eClear;
-            attachment_description.storeOp = vk::AttachmentStoreOp::eStore;
-            attachment_description.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
-            attachment_description.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
-            attachment_description.initialLayout = vk::ImageLayout::eUndefined;
-            attachment_description.finalLayout = vk::ImageLayout::ePresentSrcKHR;
+        vk::AttachmentDescription color_description{}; {
+            color_description.format = ctx.swapchain.format.format;
+            color_description.samples = vk::SampleCountFlagBits::e1;
+            color_description.loadOp = vk::AttachmentLoadOp::eClear;
+            color_description.storeOp = vk::AttachmentStoreOp::eStore;
+            color_description.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
+            color_description.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
+            color_description.initialLayout = vk::ImageLayout::eUndefined;
+            color_description.finalLayout = vk::ImageLayout::ePresentSrcKHR;
         }
 
         vk::AttachmentReference color_attachment{}; {
@@ -40,7 +40,7 @@ namespace game::core::api {
 
         vk::RenderPassCreateInfo render_pass_create_info{}; {
             render_pass_create_info.attachmentCount = 1;
-            render_pass_create_info.pAttachments = &attachment_description;
+            render_pass_create_info.pAttachments = &color_description;
             render_pass_create_info.subpassCount = 1;
             render_pass_create_info.pSubpasses = &subpass_description;
             render_pass_create_info.dependencyCount = 1;

@@ -10,6 +10,10 @@ namespace game::meta {
         DefaultSampler = 2
     };
 
+    enum class PipelineType {
+        MeshGeneric
+    };
+
     enum class PipelineLayoutType {
         MeshGeneric
     };

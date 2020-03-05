@@ -1,6 +1,7 @@
 #ifndef GAME_VULKANCONTEXT_HPP
 #define GAME_VULKANCONTEXT_HPP
 
+#include <game/core/api/Image.hpp>
 #include <game/Forwards.hpp>
 #include <game/Types.hpp>
 
@@ -28,6 +29,9 @@ namespace game::core::api {
 
         std::vector<vk::Image> images{};
         std::vector<vk::ImageView> image_views{};
+
+        Image depth_image{};
+        vk::ImageView depth_view{};
     };
 
     struct VulkanContext {

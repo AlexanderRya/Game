@@ -19,7 +19,7 @@ namespace game::core::api {
         CameraData camera_data{};
         api::MappedBuffer camera_buffer{};
 
-        std::unordered_map<u64, api::Pipeline> pipelines;
+        std::unordered_map<meta::PipelineType, api::Pipeline> pipelines;
         std::unordered_map<meta::PipelineLayoutType, api::PipelineLayout> layouts;
         std::unordered_map<meta::SamplerType, vk::Sampler> samplers;
 
