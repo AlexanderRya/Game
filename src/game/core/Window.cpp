@@ -64,7 +64,7 @@ namespace game::core {
             }
         });
 
-        // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         logger::info("Window successfully created with size: ", width, "x", height);
     }

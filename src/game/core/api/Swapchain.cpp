@@ -98,10 +98,27 @@ namespace game::core::api {
         swapchain.image_views.reserve(swapchain.image_count);
 
         for (const auto& image : swapchain.images) {
-            swapchain.image_views.emplace_back(api::make_image_view(ctx, image, swapchain.format.format));
+            swapchain.image_views.emplace_back(api::make_image_view(ctx, image, swapchain.format.format, vk::ImageAspectFlagBits::eColor));
         }
 
         logger::info("Swapchain images successfully created");
+    }
+
+    static inline void make_depth_image(const VulkanContext& ctx, Swapchain& swapchain) {
+        api::Image::CreateInfo create_info{}; {
+            create_info.ctx = &ctx;
+            create_info.format = vk::Format::eD32SfloatS8Uint;
+            create_info.tiling = vk::ImageTiling::eOptimal;
+            create_info.usage_flags = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+            create_info.memory_usage = VmaMemoryUsage::VMA_MEMORY_USAGE_GPU_ONLY;
+            create_info.height = swapchain.extent.height;
+            create_info.width = swapchain.extent.width;
+        }
+
+        swapchain.depth_image = api::make_image(create_info);
+        swapchain.depth_view = api::make_image_view(ctx, swapchain.depth_image.handle, vk::Format::eD32SfloatS8Uint, vk::ImageAspectFlagBits::eDepth);
+
+        api::transition_image_layout(ctx, swapchain.depth_image.handle, vk::ImageLayout::eUndefined, vk::ImageLayout::eDepthStencilAttachmentOptimal);
     }
 
     Swapchain make_swapchain(const Window* window, const VulkanContext& ctx) {
@@ -118,6 +135,8 @@ namespace game::core::api {
 
         get_swapchain(ctx, swapchain);
         create_images(ctx, swapchain);
+
+        make_depth_image(ctx, swapchain);
 
         return swapchain;
     }

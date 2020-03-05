@@ -29,7 +29,7 @@ namespace game::core::api {
     };
 
     [[nodiscard]] Image make_image(const Image::CreateInfo&);
-    [[nodiscard]] vk::ImageView make_image_view(const VulkanContext&, const vk::Image, const vk::Format);
+    [[nodiscard]] vk::ImageView make_image_view(const VulkanContext&, const vk::Image, const vk::Format, const vk::ImageAspectFlags);
     void transition_image_layout(const VulkanContext&, vk::Image, const vk::ImageLayout, const vk::ImageLayout);
 } // namespace game::core::api
 

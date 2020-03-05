@@ -68,7 +68,7 @@ namespace game::core::components {
             ctx, image.handle,
             vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
 
-        image_view = api::make_image_view(ctx, image.handle, vk::Format::eR8G8B8A8Srgb);
+        image_view = api::make_image_view(ctx, image.handle, vk::Format::eR8G8B8A8Srgb, vk::ImageAspectFlagBits::eColor);
 
         logger::info("Successfully loaded texture at: " + path.generic_string());
     }

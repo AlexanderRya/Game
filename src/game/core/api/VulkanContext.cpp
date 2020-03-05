@@ -92,10 +92,10 @@ namespace game::core::api {
 #endif
         ctx.surface = window->create_surface(ctx);
         ctx.device = make_device(ctx);
-        ctx.allocator = make_allocator(ctx);
-        ctx.swapchain = make_swapchain(window, ctx);
         ctx.command_pool = make_command_pool(ctx);
         ctx.transient_pool = make_transient_pool(ctx);
+        ctx.allocator = make_allocator(ctx);
+        ctx.swapchain = make_swapchain(window, ctx);
         ctx.descriptor_pool = make_descriptor_pool(ctx);
         ctx.default_render_pass = make_default_render_pass(ctx);
         ctx.default_framebuffers = make_default_framebuffers(ctx);

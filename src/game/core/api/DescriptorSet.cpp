@@ -2,6 +2,7 @@
 #include <game/core/api/DescriptorSet.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/Constants.hpp>
+#include <game/Logger.hpp>
 
 namespace game::core::api {
     void DescriptorSet::create(const CreateInfo& info) {
@@ -30,7 +31,6 @@ namespace game::core::api {
                 writes[j].descriptorCount = 1;
                 writes[j].dstArrayElement = 0;
                 writes[j].dstSet = descriptor_sets[i];
-                writes[j].pImageInfo = nullptr;
                 writes[j].pTexelBufferView = nullptr;
                 if (!write_info[j].buffer_info.empty()) {
                     writes[j].pBufferInfo = &write_info[j].buffer_info[i];
@@ -51,7 +51,6 @@ namespace game::core::api {
                     write.descriptorCount = 1;
                     write.dstArrayElement = 0;
                     write.dstSet = descriptor_sets[i];
-                    write.pImageInfo = nullptr;
                     write.pTexelBufferView = nullptr;
                 if (!write_info.buffer_info.empty()) {
                     write.pBufferInfo = &write_info.buffer_info[i];
@@ -71,7 +70,6 @@ namespace game::core::api {
             write.descriptorCount = 1;
             write.dstArrayElement = 0;
             write.dstSet = descriptor_sets[idx];
-            write.pImageInfo = nullptr;
             write.pTexelBufferView = nullptr;
             if (!write_info.buffer_info.empty()) {
                 write.pBufferInfo = &write_info.buffer_info[idx];

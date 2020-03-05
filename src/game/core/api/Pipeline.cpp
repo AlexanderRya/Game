@@ -164,7 +164,15 @@ namespace game::core::api {
         vk::PipelineDepthStencilStateCreateInfo depth_stencil_info{}; {
             depth_stencil_info.stencilTestEnable = false;
             depth_stencil_info.depthTestEnable = true;
+            depth_stencil_info.depthWriteEnable = true;
             depth_stencil_info.depthCompareOp = vk::CompareOp::eLess;
+            depth_stencil_info.depthBoundsTestEnable = false;
+            depth_stencil_info.minDepthBounds = 0.0f;
+            depth_stencil_info.maxDepthBounds = 1.0f;
+            depth_stencil_info.stencilTestEnable = false;
+            depth_stencil_info.front = vk::StencilOpState{};
+            depth_stencil_info.back = vk::StencilOpState{};
+
         }
 
         vk::PipelineColorBlendAttachmentState color_blend_attachment{}; {

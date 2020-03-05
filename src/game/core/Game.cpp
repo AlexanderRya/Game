@@ -15,7 +15,8 @@ namespace game::core {
 
     void Game::run() {
         api::RenderGraph graph{}; {
-            graph.clear_color = std::array{ 0.02f, 0.02f, 0.02f, 0.0f };
+            graph.clear_values[0].color = std::array{ 0.02f, 0.02f, 0.02f, 0.0f };
+            graph.clear_values[1].depthStencil = { { 1.0f, 0 } };
 
             graph.layouts[meta::PipelineLayoutType::MeshGeneric] = api::make_generic_pipeline_layout(context);
 
@@ -36,10 +37,10 @@ namespace game::core {
                 .vertex_count = 6,
                 .vertex_buffer_id = 1,
                 .texture_idx = 0,
-                .update = [](components::Mesh& mesh) {
+                /*.update = [](components::Mesh& mesh) {
                     mesh.instances.emplace_back();
                     mesh.instances.back().model = glm::translate(mesh.instances.end()[-2].model, glm::vec3{ 0.0f, 0.0f, -0.5f });
-                }
+                }*/
             });
         }
 

@@ -46,7 +46,7 @@ namespace game::core::api {
         return image;
     }
 
-    vk::ImageView make_image_view(const VulkanContext& ctx, const vk::Image image, const vk::Format format) {
+    vk::ImageView make_image_view(const VulkanContext& ctx, const vk::Image image, const vk::Format format, const vk::ImageAspectFlags aspect) {
         vk::ImageViewCreateInfo image_view_create_info{}; {
             image_view_create_info.image = image;
             image_view_create_info.format = format;
@@ -55,7 +55,7 @@ namespace game::core::api {
             image_view_create_info.components.b = vk::ComponentSwizzle::eIdentity;
             image_view_create_info.components.a = vk::ComponentSwizzle::eIdentity;
             image_view_create_info.viewType = vk::ImageViewType::e2D;
-            image_view_create_info.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+            image_view_create_info.subresourceRange.aspectMask = aspect;
             image_view_create_info.subresourceRange.baseMipLevel = 0;
             image_view_create_info.subresourceRange.levelCount = 1;
             image_view_create_info.subresourceRange.baseArrayLayer = 0;
@@ -102,6 +102,8 @@ namespace game::core::api {
                 source_stage = vk::PipelineStageFlagBits::eTransfer;
                 destination_stage = vk::PipelineStageFlagBits::eFragmentShader;
             } else if (old_layout == vk::ImageLayout::eUndefined && new_layout == vk::ImageLayout::eDepthStencilAttachmentOptimal) {
+                image_memory_barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+
                 image_memory_barrier.srcAccessMask = {};
                 image_memory_barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
 

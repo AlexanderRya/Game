@@ -7,6 +7,7 @@
 #include <game/core/api/Pipeline.hpp>
 #include <game/core/Globals.hpp>
 #include <game/Constants.hpp>
+#include <game/Logger.hpp>
 
 namespace game::core::api {
     Renderer::Renderer(const api::VulkanContext& context)
@@ -47,22 +48,19 @@ namespace game::core::api {
 
     void Renderer::build(RenderGraph& graph) {
         auto& command_buffer = command_buffers[image_index];
+
         vk::CommandBufferBeginInfo begin_info{}; {
             begin_info.flags |= vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
         }
 
         command_buffer.begin(begin_info, ctx.dispatcher);
 
-        vk::ClearValue clear_value{}; {
-            clear_value.color = graph.clear_color;
-        }
-
         vk::RenderPassBeginInfo render_pass_begin_info{}; {
             render_pass_begin_info.renderArea.extent = ctx.swapchain.extent;
             render_pass_begin_info.framebuffer = ctx.default_framebuffers[image_index];
             render_pass_begin_info.renderPass = ctx.default_render_pass;
-            render_pass_begin_info.clearValueCount = 1;
-            render_pass_begin_info.pClearValues = &clear_value;
+            render_pass_begin_info.clearValueCount = graph.clear_values.size();
+            render_pass_begin_info.pClearValues = graph.clear_values.data();
         }
 
         vk::Viewport viewport{}; {
@@ -83,7 +81,6 @@ namespace game::core::api {
         command_buffer.setScissor(0, scissor, ctx.dispatcher);
 
         update_camera(graph);
-        update_meshes(graph.meshes);
 
         command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
 
@@ -91,6 +88,8 @@ namespace game::core::api {
         command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graph.pipelines[meta::PipelineType::MeshGeneric].handle, ctx.dispatcher);
 
         for (auto& mesh : graph.meshes) {
+            update_meshes(mesh);
+
             command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].buffer.handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eGraphics,
@@ -150,21 +149,19 @@ namespace game::core::api {
         graph.camera_buffer[current_frame].write(&graph.camera_data, 1);
     }
 
-    void Renderer::update_meshes(std::vector<components::Mesh>& meshes) {
-        for (auto& mesh : meshes) {
-            if (mesh.instance_buffer[current_frame].size() != mesh.instances.size()) {
-                mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
+    void Renderer::update_meshes(components::Mesh& mesh) {
+        if (mesh.instance_buffer[current_frame].size() != mesh.instances.size()) {
+            mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
 
-                api::DescriptorSet::WriteInfo write_info{}; {
-                    write_info.binding = static_cast<u32>(meta::PipelineBinding::Instance);
-                    write_info.buffer_info = mesh.instance_buffer.get_info();
-                    write_info.type = vk::DescriptorType::eStorageBuffer;
-                }
-
-                mesh.descriptor_set.write_at(current_frame, write_info);
-            } else {
-                mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
+            api::DescriptorSet::WriteInfo write_info{}; {
+                write_info.binding = static_cast<u32>(meta::PipelineBinding::Instance);
+                write_info.buffer_info = mesh.instance_buffer.get_info();
+                write_info.type = vk::DescriptorType::eStorageBuffer;
             }
+
+            mesh.descriptor_set.write_at(current_frame, write_info);
+        } else {
+            mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
         }
     }
 } // namespace game::core::api

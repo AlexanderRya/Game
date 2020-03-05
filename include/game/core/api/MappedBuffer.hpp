@@ -29,7 +29,7 @@ namespace game::core::api {
     class SingleMappedBuffer {
         const api::VulkanContext* ctx{};
 
-        vk::BufferUsageFlags buffer_usage;
+        vk::BufferUsageFlags buffer_usage{};
         api::Buffer buffer{};
 
         void* mapped{};

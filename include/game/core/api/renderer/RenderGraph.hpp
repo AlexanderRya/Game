@@ -14,7 +14,7 @@
 
 namespace game::core::api {
     struct RenderGraph {
-        vk::ClearColorValue clear_color{};
+        std::array<vk::ClearValue, 2> clear_values{};
 
         CameraData camera_data{};
         api::MappedBuffer camera_buffer{};

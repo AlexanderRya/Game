@@ -17,9 +17,14 @@ namespace game::core::api {
             framebuffer_create_info.layers = 1;
         }
 
+        std::array<vk::ImageView, 2> attachments{};
+
         for (const auto& image_view : ctx.swapchain.image_views) {
-            framebuffer_create_info.attachmentCount = 1;
-            framebuffer_create_info.pAttachments = &image_view;
+            attachments[0] = image_view;
+            attachments[1] = ctx.swapchain.depth_view;
+
+            framebuffer_create_info.attachmentCount = attachments.size();
+            framebuffer_create_info.pAttachments = attachments.data();
 
             framebuffers.emplace_back(ctx.device.logical.createFramebuffer(framebuffer_create_info, nullptr, ctx.dispatcher));
         }
