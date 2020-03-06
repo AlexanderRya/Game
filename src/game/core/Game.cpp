@@ -37,10 +37,10 @@ namespace game::core {
                 .vertex_count = 6,
                 .vertex_buffer_id = 1,
                 .texture_idx = 0,
-                /*.update = [](components::Mesh& mesh) {
+                .update = [](components::Mesh& mesh) {
                     mesh.instances.emplace_back();
                     mesh.instances.back().model = glm::translate(mesh.instances.end()[-2].model, glm::vec3{ 0.0f, 0.0f, -0.5f });
-                }*/
+                }
             });
         }
 
@@ -49,9 +49,11 @@ namespace game::core {
         window.set_user_pointer(&graph);
 
         while (!window.should_close()) {
-            f32 current_frame = glfwGetTime();
-            delta_time = current_frame - last_frame;
-            last_frame = current_frame;
+            f32 frame_time = glfwGetTime();
+            delta_time = frame_time - last_frame;
+            last_frame = frame_time;
+
+            window.poll_events();
 
             if (window.get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS) {
                 window.close();
@@ -62,8 +64,6 @@ namespace game::core {
             renderer.acquire_frame();
             renderer.build(graph);
             renderer.draw();
-
-            window.poll_events();
         }
     }
 }

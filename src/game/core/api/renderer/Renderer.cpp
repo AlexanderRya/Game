@@ -150,18 +150,20 @@ namespace game::core::api {
     }
 
     void Renderer::update_meshes(components::Mesh& mesh) {
-        if (mesh.instance_buffer[current_frame].size() != mesh.instances.size()) {
-            mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
+        auto& buffer = mesh.instance_buffer[current_frame];
+
+        if (buffer.size() != mesh.instances.size()) {
+            buffer.write(mesh.instances.data(), mesh.instances.size());
 
             api::DescriptorSet::WriteInfo write_info{}; {
                 write_info.binding = static_cast<u32>(meta::PipelineBinding::Instance);
-                write_info.buffer_info = mesh.instance_buffer.get_info();
+                write_info.buffer_info = { buffer.get_info() };
                 write_info.type = vk::DescriptorType::eStorageBuffer;
             }
 
             mesh.descriptor_set.write_at(current_frame, write_info);
         } else {
-            mesh.instance_buffer[current_frame].write(mesh.instances.data(), mesh.instances.size());
+            buffer.write(mesh.instances.data(), mesh.instances.size());
         }
     }
 } // namespace game::core::api
