@@ -174,6 +174,7 @@ namespace game::core::api {
                 0.0f, -1.0f, 1.0f);
 
         projection[1][1] *= -1;
+
         graph.camera_data.pv_matrix = projection;
         graph.camera_buffer[current_frame].write(&graph.camera_data, 1);
     }

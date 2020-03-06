@@ -35,7 +35,6 @@ namespace game::core::api {
     };
 
     struct VulkanContext {
-        Window* window{};
         vk::DispatchLoaderDynamic dispatcher{};
         VmaVulkanFunctions vma_dispatcher{};
         vk::Instance instance{};

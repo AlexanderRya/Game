@@ -6,15 +6,16 @@
 #include <vulkan/vulkan.hpp>
 
 namespace game::core::api {
-    static inline vk::PhysicalDevice get_physical_device(const VulkanContext& ctx) {
+    [[nodiscard]] static inline vk::PhysicalDevice get_physical_device(const VulkanContext& ctx) {
         auto physical_devices = ctx.instance.enumeratePhysicalDevices({}, ctx.dispatcher);
 
         for (const auto& device : physical_devices) {
             auto device_properties = device.getProperties(ctx.dispatcher);
             auto device_features = device.getFeatures(ctx.dispatcher);
 
-            if ((device_properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu ||
-                device_properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu) &&
+            if ((device_properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu  ||
+                device_properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu ||
+                device_properties.deviceType == vk::PhysicalDeviceType::eVirtualGpu) &&
                 device_features.samplerAnisotropy) {
 
                 logger::info("Selected physical device: ", device_properties.deviceName);
@@ -25,7 +26,7 @@ namespace game::core::api {
         throw std::runtime_error("No suitable physical device available");
     }
 
-    static inline u32 get_queue_family(const vk::SurfaceKHR& surface, const vk::PhysicalDevice& physical_device, const vk::DispatchLoaderDynamic& dispatcher) {
+    [[nodiscard]] static inline u32 get_queue_family(const vk::SurfaceKHR& surface, const vk::PhysicalDevice& physical_device, const vk::DispatchLoaderDynamic& dispatcher) {
         auto queue_family_properties = physical_device.getQueueFamilyProperties({}, dispatcher);
 
         for (u32 i = 0; i < queue_family_properties.size(); ++i) {
@@ -38,7 +39,7 @@ namespace game::core::api {
         throw std::runtime_error("Failed to find a queue family");
     }
 
-    static inline vk::Device get_device(const u32 queue_family, const vk::PhysicalDevice& physical_device, const vk::DispatchLoaderDynamic& dispatcher) {
+    [[nodiscard]] static inline vk::Device get_device(const u32 queue_family, const vk::PhysicalDevice& physical_device, const vk::DispatchLoaderDynamic& dispatcher) {
         auto extensions = physical_device.enumerateDeviceExtensionProperties(nullptr, {}, dispatcher);
 
         constexpr const char* enabled_exts[]{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
@@ -72,7 +73,7 @@ namespace game::core::api {
         }
     }
 
-    static inline vk::Queue get_queue(const vk::Device& device, const u32 queue_family, const vk::DispatchLoaderDynamic& dispatcher) {
+    [[nodiscard]] static inline vk::Queue get_queue(const vk::Device& device, const u32 queue_family, const vk::DispatchLoaderDynamic& dispatcher) {
         return device.getQueue(queue_family, 0, dispatcher);
     }
 

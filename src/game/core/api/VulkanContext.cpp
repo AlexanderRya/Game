@@ -51,7 +51,7 @@ namespace game::core::api {
         ctx.vma_dispatcher.vkUnmapMemory = ctx.dispatcher.vkUnmapMemory;
     }
 
-    static inline VmaAllocator make_allocator(const VulkanContext& ctx) {
+    [[nodiscard]] static inline VmaAllocator make_allocator(const VulkanContext& ctx) {
         VmaAllocatorCreateInfo allocator_create_info{}; {
             allocator_create_info.pVulkanFunctions = &ctx.vma_dispatcher;
             allocator_create_info.instance = static_cast<VkInstance>(ctx.instance);
@@ -82,7 +82,6 @@ namespace game::core::api {
 
         logger::info("Vulkan initialization sequence starting");
         load_vulkan_module(ctx);
-        ctx.window = window;
         ctx.instance = make_instance(ctx);
         ctx.dispatcher.init(static_cast<VkInstance>(ctx.instance), ctx.dispatcher.vkGetInstanceProcAddr);
         load_vma(ctx);

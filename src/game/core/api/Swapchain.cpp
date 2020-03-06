@@ -8,7 +8,7 @@
 #include <vulkan/vulkan.hpp>
 
 namespace game::core::api {
-    static inline u32 get_image_count(const vk::SurfaceCapabilitiesKHR& capabilities) {
+    [[nodiscard]] static inline u32 get_image_count(const vk::SurfaceCapabilitiesKHR& capabilities) {
         auto count = capabilities.minImageCount + 1;
 
         if (capabilities.maxImageCount > 0 && count > capabilities.maxImageCount) {
@@ -20,7 +20,7 @@ namespace game::core::api {
         return count;
     }
 
-    static inline vk::Extent2D get_extent(const Window* window, const vk::SurfaceCapabilitiesKHR& capabilities) {
+    [[nodiscard]] static inline vk::Extent2D get_extent(const Window* window, const vk::SurfaceCapabilitiesKHR& capabilities) {
         if (capabilities.currentExtent.width != UINT32_MAX) {
 
             return capabilities.currentExtent;
@@ -34,7 +34,7 @@ namespace game::core::api {
         }
     }
 
-    static inline vk::SurfaceFormatKHR get_format(const VulkanContext& ctx) {
+    [[nodiscard]] static inline vk::SurfaceFormatKHR get_format(const VulkanContext& ctx) {
         auto surface_formats = ctx.device.physical.getSurfaceFormatsKHR(ctx.surface, {}, ctx.dispatcher);
 
         vk::SurfaceFormatKHR format = surface_formats[0];
@@ -55,7 +55,7 @@ namespace game::core::api {
         return format;
     }
 
-    static inline vk::PresentModeKHR get_present_mode(const VulkanContext& ctx) {
+    [[nodiscard]] static inline vk::PresentModeKHR get_present_mode(const VulkanContext& ctx) {
         for (const auto& mode : ctx.device.physical.getSurfacePresentModesKHR(ctx.surface, {}, ctx.dispatcher)) {
             if (mode == vk::PresentModeKHR::eImmediate) {
                 logger::info("Swapchain details: present mode: vk::PresentModeKHR::", vk::to_string(mode));

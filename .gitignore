@@ -4,7 +4,7 @@
 /dump/
 .idea
 .idea/.gitignore
-.idea/Snake.iml
+.idea/Game.iml
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml

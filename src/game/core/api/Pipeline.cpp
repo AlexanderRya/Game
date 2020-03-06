@@ -7,7 +7,7 @@
 #include <game/Constants.hpp>
 
 namespace game::core::api {
-    static inline vk::ShaderModule load_module(const VulkanContext* ctx, const std::filesystem::path& path) {
+    [[nodiscard]] static inline vk::ShaderModule load_module(const VulkanContext* ctx, const std::filesystem::path& path) {
         std::ifstream in(path.generic_string(), std::fstream::binary);
 
         if (!in.is_open()) {
@@ -168,8 +168,8 @@ namespace game::core::api {
 
         vk::PipelineDepthStencilStateCreateInfo depth_stencil_info{}; {
             depth_stencil_info.stencilTestEnable = false;
-            depth_stencil_info.depthTestEnable = true;
-            depth_stencil_info.depthWriteEnable = true;
+            depth_stencil_info.depthTestEnable = false;
+            depth_stencil_info.depthWriteEnable = false;
             depth_stencil_info.depthCompareOp = vk::CompareOp::eLess;
             depth_stencil_info.depthBoundsTestEnable = false;
             depth_stencil_info.minDepthBounds = 0.0f;
@@ -177,18 +177,17 @@ namespace game::core::api {
             depth_stencil_info.stencilTestEnable = false;
             depth_stencil_info.front = vk::StencilOpState{};
             depth_stencil_info.back = vk::StencilOpState{};
-
         }
 
         vk::PipelineColorBlendAttachmentState color_blend_attachment{}; {
-            color_blend_attachment.blendEnable = false;
+            color_blend_attachment.blendEnable = true;
             color_blend_attachment.colorWriteMask =
                 vk::ColorComponentFlagBits::eR |
                 vk::ColorComponentFlagBits::eG |
                 vk::ColorComponentFlagBits::eB |
                 vk::ColorComponentFlagBits::eA;
-            color_blend_attachment.srcColorBlendFactor = vk::BlendFactor::eOne;
-            color_blend_attachment.dstColorBlendFactor = vk::BlendFactor::eZero;
+            color_blend_attachment.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
+            color_blend_attachment.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
             color_blend_attachment.colorBlendOp = vk::BlendOp::eAdd;
             color_blend_attachment.srcAlphaBlendFactor = vk::BlendFactor::eOne;
             color_blend_attachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;

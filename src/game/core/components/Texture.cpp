@@ -22,11 +22,7 @@ namespace game::core::components {
         }
 
         auto data = stbi_load(path.generic_string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
-        logger::info(
-            "Loading texture: " + path.generic_string() +
-            ", width: ", width,
-            ", height: ", height,
-            ", channels: ", channels);
+        logger::info("Loading texture: " + path.generic_string());
 
         if (!data) {
             throw std::runtime_error("Failed to load texture!");
@@ -70,7 +66,10 @@ namespace game::core::components {
 
         image_view = api::make_image_view(ctx, image.handle, vk::Format::eR8G8B8A8Srgb, vk::ImageAspectFlagBits::eColor);
 
-        logger::info("Successfully loaded texture at: " + path.generic_string());
+        logger::info("Successfully loaded texture, "
+                     "width: ", width,
+                     ", height: ", height,
+                     ", channels: ", channels);
     }
 
     vk::DescriptorImageInfo Texture::get_info() const {

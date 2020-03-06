@@ -73,7 +73,7 @@ namespace game::core::api {
         return 0;
     }
 
-    static inline std::vector<const char*> get_required_extensions(const VulkanContext& ctx) {
+    [[nodiscard]] static inline std::vector<const char*> get_required_extensions(const VulkanContext& ctx) {
         u32 count = 0;
 
         auto required_extensions = glfwGetRequiredInstanceExtensions(&count);

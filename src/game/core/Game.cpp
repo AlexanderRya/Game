@@ -1,6 +1,7 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
 #include <game/core/components/Texture.hpp>
 #include <game/core/components/Camera.hpp>
+#include <game/core/gameplay/Level.hpp>
 #include <game/core/api/Sampler.hpp>
 #include <game/core/Globals.hpp>
 #include <game/core/Game.hpp>
@@ -10,7 +11,7 @@
 
 namespace game::core {
     Game::Game()
-    : window(1280, 720, "Game"),
+    : window(800, 600, "Game"),
       context(api::make_vulkan_context(&window)),
       renderer(context) {
         renderer.init_rendering_data();
@@ -25,7 +26,10 @@ namespace game::core {
 
             graph.samplers[meta::SamplerType::Default] = api::make_default_sampler(context);
 
-            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/test.jpg");
+            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/block.png");
+            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/block_solid.png");
+            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/background.jpg");
+            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/paddle.png");
 
             api::Pipeline::CreateInfo create_info{}; {
                 create_info.ctx = &context;
@@ -36,46 +40,7 @@ namespace game::core {
 
             graph.pipelines[meta::PipelineType::MeshGeneric] = api::make_generic_pipeline(create_info);
 
-            graph.game_objects.emplace_back(components::GameObject{
-                .vertex_count = 6,
-                .vertex_buffer_id = 1,
-                .texture_idx = 0,
-            });
-
-            graph.game_objects[0].info.emplace_back(GameObjectInfo{
-                .position = { 100, -360 },
-                .size = { 200, 200 },
-                .rotation = glm::radians(180.f),
-                .color = { 1, 1, 1 }
-            });
-
-            graph.game_objects[0].info.emplace_back(GameObjectInfo{
-                .position = { 300, -360 },
-                .size = { 200, 200 },
-                .rotation = glm::radians(180.f),
-                .color = { 1, 1, 1 },
-            });
-
-            graph.game_objects[0].info.emplace_back(GameObjectInfo{
-                .position = { 500, -360 },
-                .size = { 200, 200 },
-                .rotation = glm::radians(180.f),
-                .color = { 1, 1, 1 }
-            });
-
-            graph.game_objects[0].info.emplace_back(GameObjectInfo{
-                .position = { 700, -360 },
-                .size = { 200, 200 },
-                .rotation = glm::radians(180.f),
-                .color = { 1, 1, 1 }
-            });
-
-            graph.game_objects[0].info.emplace_back(GameObjectInfo{
-                .position = { 900, -360 },
-                .size = { 200, 200 },
-                .rotation = glm::radians(180.f),
-                .color = { 1, 1, 1 }
-            });
+            graph.game_objects = gameplay::load_level("../resources/levels/level1.lvl", Window::width, Window::height / 2);
         }
 
         graph.build(context);
