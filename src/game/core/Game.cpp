@@ -45,41 +45,36 @@ namespace game::core {
             graph.game_objects[0].info.emplace_back(GameObjectInfo{
                 .position = { 100, -360 },
                 .size = { 200, 200 },
-                .rotation = 0,
-                .color = { 1, 1, 1 },
-                .update = [](GameObjectInfo& info) {
-                    info.rotation = static_cast<float>(glfwGetTime());
-                }
+                .rotation = glm::radians(180.f),
+                .color = { 1, 1, 1 }
             });
 
             graph.game_objects[0].info.emplace_back(GameObjectInfo{
                 .position = { 300, -360 },
                 .size = { 200, 200 },
-                .rotation = 0,
+                .rotation = glm::radians(180.f),
                 .color = { 1, 1, 1 },
-                .update = [](GameObjectInfo& info) {
-                    info.rotation = static_cast<float>(glfwGetTime());
-                }
             });
 
             graph.game_objects[0].info.emplace_back(GameObjectInfo{
                 .position = { 500, -360 },
                 .size = { 200, 200 },
-                .rotation = 0,
-                .color = { 1, 1, 1 },
-                .update = [](GameObjectInfo& info) {
-                    info.rotation = static_cast<float>(glfwGetTime());
-                }
+                .rotation = glm::radians(180.f),
+                .color = { 1, 1, 1 }
             });
 
             graph.game_objects[0].info.emplace_back(GameObjectInfo{
                 .position = { 700, -360 },
                 .size = { 200, 200 },
-                .rotation = 0,
-                .color = { 1, 1, 1 },
-                .update = [](GameObjectInfo& info) {
-                    info.rotation = static_cast<float>(glfwGetTime());
-                }
+                .rotation = glm::radians(180.f),
+                .color = { 1, 1, 1 }
+            });
+
+            graph.game_objects[0].info.emplace_back(GameObjectInfo{
+                .position = { 900, -360 },
+                .size = { 200, 200 },
+                .rotation = glm::radians(180.f),
+                .color = { 1, 1, 1 }
             });
         }
 
