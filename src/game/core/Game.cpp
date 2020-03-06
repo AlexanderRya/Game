@@ -5,6 +5,9 @@
 #include <game/core/Globals.hpp>
 #include <game/core/Game.hpp>
 
+#include <iostream>
+#include <fstream>
+
 namespace game::core {
     Game::Game()
     : window(1280, 720, "Game"),
@@ -33,13 +36,49 @@ namespace game::core {
 
             graph.pipelines[meta::PipelineType::MeshGeneric] = api::make_generic_pipeline(create_info);
 
-            graph.meshes.emplace_back(components::Mesh{
+            graph.game_objects.emplace_back(components::GameObject{
                 .vertex_count = 6,
                 .vertex_buffer_id = 1,
                 .texture_idx = 0,
-                .update = [](components::Mesh& mesh) {
-                    mesh.instances.emplace_back();
-                    mesh.instances.back().model = glm::translate(mesh.instances.end()[-2].model, glm::vec3{ 0.0f, 0.0f, -0.5f });
+            });
+
+            graph.game_objects[0].info.emplace_back(GameObjectInfo{
+                .position = { 100, -360 },
+                .size = { 200, 200 },
+                .rotation = 0,
+                .color = { 1, 1, 1 },
+                .update = [](GameObjectInfo& info) {
+                    info.rotation = static_cast<float>(glfwGetTime());
+                }
+            });
+
+            graph.game_objects[0].info.emplace_back(GameObjectInfo{
+                .position = { 300, -360 },
+                .size = { 200, 200 },
+                .rotation = 0,
+                .color = { 1, 1, 1 },
+                .update = [](GameObjectInfo& info) {
+                    info.rotation = static_cast<float>(glfwGetTime());
+                }
+            });
+
+            graph.game_objects[0].info.emplace_back(GameObjectInfo{
+                .position = { 500, -360 },
+                .size = { 200, 200 },
+                .rotation = 0,
+                .color = { 1, 1, 1 },
+                .update = [](GameObjectInfo& info) {
+                    info.rotation = static_cast<float>(glfwGetTime());
+                }
+            });
+
+            graph.game_objects[0].info.emplace_back(GameObjectInfo{
+                .position = { 700, -360 },
+                .size = { 200, 200 },
+                .rotation = 0,
+                .color = { 1, 1, 1 },
+                .update = [](GameObjectInfo& info) {
+                    info.rotation = static_cast<float>(glfwGetTime());
                 }
             });
         }
@@ -53,17 +92,24 @@ namespace game::core {
             delta_time = frame_time - last_frame;
             last_frame = frame_time;
 
-            window.poll_events();
-
             if (window.get_key(GLFW_KEY_ESCAPE) == GLFW_PRESS) {
                 window.close();
             }
 
-            camera.move(window);
+            window.poll_events();
 
             renderer.acquire_frame();
             renderer.build(graph);
             renderer.draw();
         }
+    }
+
+    Game::~Game() {
+        char* str = new char[1000000]{};
+        vmaBuildStatsString(context.allocator, &str, true);
+
+        std::ofstream("../dump/stats.json") << str;
+
+        vmaFreeStatsString(context.allocator, str);
     }
 }

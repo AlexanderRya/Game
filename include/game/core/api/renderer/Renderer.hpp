@@ -27,7 +27,7 @@ namespace game::core::api {
         u32 current_frame{};
 
         void update_camera(RenderGraph&);
-        void update_meshes(components::Mesh&);
+        void update_objects(components::GameObject& object);
     public:
         explicit Renderer(const VulkanContext&);
 

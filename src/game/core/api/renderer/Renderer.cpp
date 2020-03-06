@@ -1,9 +1,9 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
 #include <game/core/api/renderer/Renderer.hpp>
+#include <game/core/components/GameObject.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/CommandBuffer.hpp>
 #include <game/core/api/VertexBuffer.hpp>
-#include <game/core/components/Mesh.hpp>
 #include <game/core/api/Pipeline.hpp>
 #include <game/core/Globals.hpp>
 #include <game/Constants.hpp>
@@ -87,22 +87,43 @@ namespace game::core::api {
         // Start mesh pass
         command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graph.pipelines[meta::PipelineType::MeshGeneric].handle, ctx.dispatcher);
 
-        for (auto& mesh : graph.meshes) {
-            update_meshes(mesh);
+        for (auto& object : graph.game_objects) {
+            object.instances.resize(object.info.size());
+            object.colors.resize(object.info.size());
 
-            command_buffer.bindVertexBuffers(0, vertex_buffers[mesh.vertex_buffer_id].buffer.handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
+            for (usize i = 0; i < object.info.size(); ++i) {
+                auto& color = object.colors[i].color;
+                auto& model = object.instances[i].model;
+                auto& info = object.info[i];
+
+                if (info.update) {
+                    info.update(info);
+                }
+
+                color = info.color;
+
+                model = glm::mat4(1.0f);
+
+                model = glm::translate(model, glm::vec3(info.position, 0.0f));
+
+                model = glm::translate(model, glm::vec3(0.5f * info.size.x, 0.5f * info.size.y, 0.0f));
+                model = glm::rotate(model, info.rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+                model = glm::translate(model, glm::vec3(-0.5f * info.size.x, -0.5f * info.size.y, 0.0f));
+
+                model = glm::scale(model, glm::vec3(info.size, 1.0f));
+            }
+
+            update_objects(object);
+
+            command_buffer.bindVertexBuffers(0, vertex_buffers[object.vertex_buffer_id].buffer.handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eGraphics,
                 graph.layouts[meta::PipelineLayoutType::MeshGeneric].pipeline,
                 0,
-                mesh.descriptor_set[current_frame],
+                object.descriptor_set[current_frame],
                 nullptr,
                 ctx.dispatcher);
-            command_buffer.draw(mesh.vertex_count, mesh.instances.size(), 0, 0, ctx.dispatcher);
-
-            if (mesh.update) { // Debug stuff
-                mesh.update(mesh);
-            }
+            command_buffer.draw(object.vertex_count, object.instances.size(), 0, 0, ctx.dispatcher);
         }
 
         command_buffer.endRenderPass(ctx.dispatcher);
@@ -140,30 +161,53 @@ namespace game::core::api {
     }
 
     void Renderer::update_camera(RenderGraph& graph) {
-        auto projection = glm::perspective(
-            glm::radians(60.f),
+        /*auto projection = glm::perspective(
+            glm::radians(45.f),
             static_cast<float>(ctx.swapchain.extent.width) / ctx.swapchain.extent.height,
-            0.01f, 100.f);
+            0.01f, 100.f);*/
+
+        auto projection =
+            glm::ortho(
+                0.0f,
+                static_cast<float>(ctx.swapchain.extent.width),
+                static_cast<float>(ctx.swapchain.extent.height),
+                0.0f, -1.0f, 1.0f);
+
         projection[1][1] *= -1;
-        graph.camera_data.pv_matrix = projection * camera.get_view_mat();
+        graph.camera_data.pv_matrix = projection;
         graph.camera_buffer[current_frame].write(&graph.camera_data, 1);
     }
 
-    void Renderer::update_meshes(components::Mesh& mesh) {
-        auto& buffer = mesh.instance_buffer[current_frame];
+    void Renderer::update_objects(components::GameObject& object) {
+        auto& instance_buffer = object.instance_buffer[current_frame];
+        auto& color_buffer = object.color_buffer[current_frame];
 
-        if (buffer.size() != mesh.instances.size()) {
-            buffer.write(mesh.instances.data(), mesh.instances.size());
+        if (instance_buffer.size() != object.instances.size()) {
+            instance_buffer.write(object.instances.data(), object.instances.size());
 
             api::DescriptorSet::WriteInfo write_info{}; {
                 write_info.binding = static_cast<u32>(meta::PipelineBinding::Instance);
-                write_info.buffer_info = { buffer.get_info() };
+                write_info.buffer_info = { instance_buffer.get_info() };
                 write_info.type = vk::DescriptorType::eStorageBuffer;
             }
 
-            mesh.descriptor_set.write_at(current_frame, write_info);
+            object.descriptor_set.write_at(current_frame, write_info);
         } else {
-            buffer.write(mesh.instances.data(), mesh.instances.size());
+            instance_buffer.write(object.instances.data(), object.instances.size());
+        }
+
+        if (color_buffer.size() != object.colors.size()) {
+            color_buffer.write(object.colors.data(), object.colors.size());
+
+            api::DescriptorSet::WriteInfo write_info{}; {
+                write_info.binding = static_cast<u32>(meta::PipelineBinding::Color);
+                write_info.buffer_info = { color_buffer.get_info() };
+                write_info.type = vk::DescriptorType::eStorageBuffer;
+            }
+
+            object.descriptor_set.write_at(current_frame, write_info);
+        } else {
+            color_buffer.write(object.colors.data(), object.colors.size());
         }
     }
 } // namespace game::core::api

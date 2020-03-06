@@ -1,8 +1,8 @@
 #ifndef GAME_RENDERGRAPH_HPP
 #define GAME_RENDERGRAPH_HPP
 
+#include <game/core/components/GameObject.hpp>
 #include <game/core/components/Camera.hpp>
-#include <game/core/components/Mesh.hpp>
 #include <game/core/api/Pipeline.hpp>
 #include <game/Constants.hpp>
 #include <game/Forwards.hpp>
@@ -24,7 +24,7 @@ namespace game::core::api {
         std::unordered_map<meta::SamplerType, vk::Sampler> samplers;
 
         std::vector<components::Texture> textures;
-        std::vector<components::Mesh> meshes;
+        std::vector<components::GameObject> game_objects;
 
         void build(const VulkanContext&);
     };

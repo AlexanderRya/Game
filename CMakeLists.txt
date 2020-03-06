@@ -50,7 +50,7 @@ set(GAME_HEADERS
         include/game/core/api/renderer/Renderer.hpp
         include/game/core/api/VertexBuffer.hpp
         include/game/core/api/Pipeline.hpp
-        include/game/core/components/Mesh.hpp
+        include/game/core/components/GameObject.hpp
         include/game/core/Game.hpp
         include/game/core/api/Buffer.hpp
         include/game/core/api/renderer/RenderGraph.hpp
@@ -82,7 +82,7 @@ set(GAME_SOURCES
         src/game/core/Game.cpp
         src/game/core/api/VertexBuffer.cpp
         src/game/core/api/Buffer.cpp
-        src/game/core/components/Mesh.cpp
+        src/game/core/components/GameObject.cpp
         src/game/core/api/DescriptorSet.cpp
         src/game/core/api/MappedBuffer.cpp
         src/game/core/api/renderer/RenderGraph.cpp
@@ -96,7 +96,7 @@ add_executable(Game
         ${GAME_HEADERS}
         ${GAME_SOURCES})
 
-target_compile_options(Game PRIVATE -std=c++20 -O0 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
 
 if (WIN32)
     target_compile_definitions(Game PRIVATE _CRT_SECURE_NO_WARNINGS)

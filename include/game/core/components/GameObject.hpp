@@ -1,5 +1,5 @@
-#ifndef GAME_MESH_HPP
-#define GAME_MESH_HPP
+#ifndef GAME_GAMEOBJECT_HPP
+#define GAME_GAMEOBJECT_HPP
 
 #include <game/core/api/DescriptorSet.hpp>
 #include <game/core/api/MappedBuffer.hpp>
@@ -10,7 +10,9 @@
 #include <vector>
 
 namespace game::core::components {
-    struct Mesh {
+
+
+    struct GameObject {
         struct BuildInfo {
             const api::VulkanContext* ctx{};
 
@@ -23,11 +25,14 @@ namespace game::core::components {
         u64 vertex_buffer_id{};
         u64 texture_idx{};
 
-        void (*update)(Mesh&);
+        api::DescriptorSet descriptor_set{};
+
+        std::vector<GameObjectInfo> info{};
 
         std::vector<Instance> instances{};
-        api::DescriptorSet descriptor_set{};
         api::MappedBuffer instance_buffer{};
+        std::vector<ColorInstance> colors{};
+        api::MappedBuffer color_buffer{};
 
         void build(const BuildInfo&);
     };
@@ -36,4 +41,4 @@ namespace game::core::components {
     [[nodiscard]] std::vector<Vertex> generate_quad_geometry();
 }
 
-#endif //GAME_MESH_HPP
+#endif //GAME_GAMEOBJECT_HPP

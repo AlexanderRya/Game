@@ -35,7 +35,7 @@ namespace game::core {
             throw std::runtime_error("Failed window creation");
         }
 
-        glfwSetCursorPosCallback(window, [](GLFWwindow*, const double xpos, const double ypos) {
+        /*glfwSetCursorPosCallback(window, [](GLFWwindow*, const double xpos, const double ypos) {
             static double lastX = width / 2.0, lastY = height / 2.0;
             static bool first = true;
 
@@ -52,19 +52,13 @@ namespace game::core {
             lastY = ypos;
 
             camera.process(xoffset, yoffset);
-        });
+        });*/
 
-        glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
-            if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-                auto& graph_ptr = *reinterpret_cast<api::RenderGraph*>(glfwGetWindowUserPointer(window));
-                auto& mesh = graph_ptr.meshes[0];
+        /*glfwSetMouseButtonCallback(window, [](GLFWwindow*, int, int, int) {
 
-                mesh.instances.emplace_back();
-                mesh.instances.back().model = glm::translate(mesh.instances.end()[-2].model, glm::vec3{ 0.0f, 0.0f, -0.5f });
-            }
-        });
+        });*/
 
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         logger::info("Window successfully created with size: ", width, "x", height);
     }

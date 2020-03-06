@@ -25,7 +25,6 @@ namespace game::core::components {
         glm::vec3 cam_right = glm::vec3();
         glm::vec3 cam_wup = glm::vec3(0.0f, 1.0f, 0.0f);
 
-        //!TODO: Implement this shit
         Camera();
         void move(const Window&);
         [[nodiscard]] glm::mat4 get_view_mat() const;

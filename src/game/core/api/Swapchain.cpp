@@ -25,7 +25,7 @@ namespace game::core::api {
 
             return capabilities.currentExtent;
         } else {
-            vk::Extent2D actual_extent{ window->width, window->height };
+            vk::Extent2D actual_extent{ static_cast<u32>(window->width), static_cast<u32>(window->height) };
 
             actual_extent.width = std::clamp(actual_extent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
             actual_extent.height = std::clamp(actual_extent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);

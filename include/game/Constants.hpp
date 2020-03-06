@@ -6,7 +6,9 @@ namespace game::meta {
 
     enum class PipelineBinding : u32 {
         Camera = 0,
-        Instance = 1, DefaultSampler = 2
+        Instance = 1,
+        Color = 2,
+        DefaultSampler = 3
     };
 
     enum class PipelineType {

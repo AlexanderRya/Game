@@ -1,7 +1,9 @@
 #include <game/core/Game.hpp>
+#include <iostream>
 
 int main() {
-    game::core::Game game;
+    using namespace game::core;
+    Game game;
     game.run();
     return 0;
 }

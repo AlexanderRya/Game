@@ -9,7 +9,7 @@ namespace game::core {
         GLFWwindow* window{};
     public:
         static inline bool resized = true;
-        static inline u32 width{}, height{};
+        static inline i32 width{}, height{};
 
         Window(const i32, const i32, const char*);
 

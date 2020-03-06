@@ -23,15 +23,15 @@ namespace game::core::api {
             }
         }
 
-        for (auto& mesh : meshes) {
-            components::Mesh::BuildInfo info{}; {
+        for (auto& object : game_objects) {
+            components::GameObject::BuildInfo info{}; {
                 info.ctx = &ctx;
                 info.layout = layouts[meta::PipelineLayoutType::MeshGeneric].set;
                 info.camera_buffer = &camera_buffer;
-                info.texture = &textures[mesh.texture_idx];
+                info.texture = &textures[object.texture_idx];
             }
 
-            mesh.build(info);
+            object.build(info);
         }
     }
 } // namespace game::core::api
