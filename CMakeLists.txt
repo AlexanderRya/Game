@@ -3,13 +3,15 @@ project(Game)
 
 find_package(Vulkan REQUIRED)
 
+add_subdirectory(external/entt)
 add_subdirectory(external/glfw)
 add_subdirectory(external/glm)
 
 include_directories(Game
         include
-        external/stb
+        external
         external/glm
+        external/entt/src
         external/glfw/include
         external/VulkanMemoryAllocator/src
         ${Vulkan_INCLUDE_DIRS})
@@ -25,7 +27,7 @@ set(STB_HEADERS
         external/stb/stb_image.h)
 
 set(STB_SOURCES
-        src/game/STBImpl.cpp)
+        src/game/STB_Impl.cpp)
 
 set(VMA_HEADERS
         external/VulkanMemoryAllocator/src/vk_mem_alloc.h)
@@ -50,10 +52,8 @@ set(GAME_HEADERS
         include/game/core/api/renderer/Renderer.hpp
         include/game/core/api/VertexBuffer.hpp
         include/game/core/api/Pipeline.hpp
-        include/game/core/components/GameObject.hpp
         include/game/core/Game.hpp
         include/game/core/api/Buffer.hpp
-        include/game/core/api/renderer/RenderGraph.hpp
         include/game/core/api/DescriptorSet.hpp
         include/game/Constants.hpp
         include/game/core/api/MappedBuffer.hpp
@@ -61,7 +61,10 @@ set(GAME_HEADERS
         include/game/core/Globals.hpp
         include/game/core/components/Texture.hpp
         include/game/core/api/Image.hpp
-        include/game/core/api/Sampler.hpp include/game/core/gameplay/Level.hpp)
+        include/game/core/api/Sampler.hpp
+        include/game/core/api/renderer/RenderGraph.hpp
+        include/game/core/components/GameObject.hpp
+        include/game/core/components/Transform.hpp)
 
 set(GAME_SOURCES
         ${STB_SOURCES}
@@ -82,15 +85,13 @@ set(GAME_SOURCES
         src/game/core/Game.cpp
         src/game/core/api/VertexBuffer.cpp
         src/game/core/api/Buffer.cpp
-        src/game/core/components/GameObject.cpp
         src/game/core/api/DescriptorSet.cpp
         src/game/core/api/MappedBuffer.cpp
-        src/game/core/api/renderer/RenderGraph.cpp
         src/game/core/api/VulkanMemoryAllocator.cpp
         src/game/core/components/Camera.cpp
         src/game/core/api/Image.cpp
         src/game/core/components/Texture.cpp
-        src/game/core/api/Sampler.cpp src/game/core/gameplay/Level.cpp)
+        src/game/core/api/Sampler.cpp )
 
 add_executable(Game
         ${GAME_HEADERS}

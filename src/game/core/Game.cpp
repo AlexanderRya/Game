@@ -1,51 +1,57 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
+#include <game/core/components/GameObject.hpp>
 #include <game/core/components/Texture.hpp>
 #include <game/core/components/Camera.hpp>
-#include <game/core/gameplay/Level.hpp>
 #include <game/core/api/Sampler.hpp>
 #include <game/core/Globals.hpp>
 #include <game/core/Game.hpp>
+
+#include <entt/entt.hpp>
 
 #include <iostream>
 #include <fstream>
 
 namespace game::core {
     Game::Game()
-    : window(800, 600, "Game"),
+    : window(1280, 720, "Game"),
       context(api::make_vulkan_context(&window)),
       renderer(context) {
         renderer.init_rendering_data();
     }
 
     void Game::run() {
-        api::RenderGraph graph{}; {
-            graph.clear_values[0].color = std::array{ 0.02f, 0.02f, 0.02f, 0.0f };
-            graph.clear_values[1].depthStencil = { { 1.0f, 0 } };
+        api::renderer::RenderGraph graph{};
+        entt::registry registry{};
 
-            graph.layouts[meta::PipelineLayoutType::MeshGeneric] = api::make_generic_pipeline_layout(context);
+        graph.textures.reserve(4);
+        graph.textures.emplace_back(&context).load("../resources/textures/background.jpg");
+        graph.textures.emplace_back(&context).load("../resources/textures/block.png");
+        graph.textures.emplace_back(&context).load("../resources/textures/block_solid.png");
+        graph.textures.emplace_back(&context).load("../resources/textures/paddle.png");
 
-            graph.samplers[meta::SamplerType::Default] = api::make_default_sampler(context);
-
-            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/block.png");
-            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/block_solid.png");
-            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/background.jpg");
-            graph.textures.emplace_back(context, graph.samplers[meta::SamplerType::Default]).load("../resources/textures/paddle.png");
-
-            api::Pipeline::CreateInfo create_info{}; {
-                create_info.ctx = &context;
-                create_info.vertex_path = "../resources/shaders/generic.vert.spv";
-                create_info.fragment_path = "../resources/shaders/generic.frag.spv";
-                create_info.layout = graph.layouts[meta::PipelineLayoutType::MeshGeneric];
-            }
-
-            graph.pipelines[meta::PipelineType::MeshGeneric] = api::make_generic_pipeline(create_info);
-
-            graph.game_objects = gameplay::load_level("../resources/levels/level1.lvl", Window::width, Window::height / 2);
+        graph.main_camera = registry.create(); {
+            registry.assign<components::CameraData>(graph.main_camera);
         }
 
-        graph.build(context);
+        graph.objects.emplace_back(registry.create()); {
+            components::GameObject bricks{}; {
+                bricks.vertex_buffer_idx = 1;
+                bricks.vertex_count = 6;
 
-        window.set_user_pointer(&graph);
+                bricks.transforms = {
+                    components::Transform {
+                        .position = { 0.0f, -Window::height * 2, 0.0f },
+                        .size = { Window::width, Window::height * 2, 0.0f },
+                        .color = { 1.0f, 1.0f, 1.0f }
+                    }
+                };
+            }
+
+            registry.assign<components::GameObject>(graph.objects.back(), bricks);
+            registry.assign<components::Texture>(graph.objects.back(), graph.textures[0]);
+        }
+
+        renderer.build(graph, registry);
 
         while (!window.should_close()) {
             f32 frame_time = glfwGetTime();
@@ -59,8 +65,12 @@ namespace game::core {
             window.poll_events();
 
             renderer.acquire_frame();
-            renderer.build(graph);
-            renderer.draw();
+
+            renderer.start(); {
+                renderer.draw(graph, registry);
+            } renderer.end();
+
+            renderer.submit();
         }
     }
 

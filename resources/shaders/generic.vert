@@ -10,16 +10,17 @@ layout (set = 0, binding = 0) uniform CameraData {
     mat4 pv_matrix;
 } camera;
 
-layout (set = 0, binding = 1) buffer readonly Instance {
-    mat4 models[];
+struct Transform {
+    mat4 model;
+    vec3 color;
+};
+
+layout (std430, set = 0, binding = 1) buffer readonly Instance {
+    Transform transforms[];
 } instances;
 
-layout (set = 0, binding = 2) buffer readonly ColorData {
-    vec3 colors[];
-} color_instances;
-
 void main() {
-    gl_Position = camera.pv_matrix * instances.models[gl_InstanceIndex] * vec4(ivertex_pos, 1.0f);
+    gl_Position = camera.pv_matrix * instances.transforms[gl_InstanceIndex].model * vec4(ivertex_pos, 1.0f);
     otexture_coords = itexture_coords;
-    ocolor = color_instances.colors[gl_InstanceIndex];
+    ocolor = instances.transforms[gl_InstanceIndex].color;
 }

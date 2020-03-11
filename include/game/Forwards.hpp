@@ -25,7 +25,6 @@ namespace game::core::api {
     struct VulkanContext;
     struct Device;
     struct Swapchain;
-    struct RenderGraph;
     class DescriptorSet;
     struct Image;
 } // namespace game::core::api
@@ -40,5 +39,9 @@ namespace game::core::components {
     struct GameObject;
     class Texture;
 } // namespace game::core::components
+
+namespace game::core::api::renderer {
+    struct RenderGraph;
+} // namespace game::core::api::renderer
 
 #endif //GAME_FORWARDS_HPP

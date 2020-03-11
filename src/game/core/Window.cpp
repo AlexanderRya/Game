@@ -1,7 +1,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include <game/core/api/renderer/RenderGraph.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/Globals.hpp>
 #include <game/core/Window.hpp>

@@ -1,33 +1,22 @@
 #ifndef GAME_RENDERGRAPH_HPP
 #define GAME_RENDERGRAPH_HPP
 
-#include <game/core/components/GameObject.hpp>
-#include <game/core/components/Camera.hpp>
-#include <game/core/api/Pipeline.hpp>
-#include <game/Constants.hpp>
-#include <game/Forwards.hpp>
-#include <game/Types.hpp>
+#include <game/core/api/MappedBuffer.hpp>
 
+#include <entt/entt.hpp>
 #include <vulkan/vulkan.hpp>
 
-#include <unordered_map>
+#include <vector>
+#include <array>
 
-namespace game::core::api {
+namespace game::core::api::renderer {
     struct RenderGraph {
-        std::array<vk::ClearValue, 2> clear_values{};
+        entt::entity main_camera;
+        std::vector<entt::entity> objects{};
+        std::vector<components::Texture> textures{};
 
-        CameraData camera_data{};
         api::MappedBuffer camera_buffer{};
-
-        std::unordered_map<meta::PipelineType, api::Pipeline> pipelines;
-        std::unordered_map<meta::PipelineLayoutType, api::PipelineLayout> layouts;
-        std::unordered_map<meta::SamplerType, vk::Sampler> samplers;
-
-        std::vector<components::Texture> textures;
-        std::vector<components::GameObject> game_objects;
-
-        void build(const VulkanContext&);
     };
-} // namespace game::core::api
+} // namespace game::core::api::renderer
 
 #endif //GAME_RENDERGRAPH_HPP

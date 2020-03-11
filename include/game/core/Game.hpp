@@ -13,7 +13,7 @@ namespace game::core {
     class Game {
         Window window;
         api::VulkanContext context;
-        api::Renderer renderer;
+        api::renderer::Renderer renderer;
     public:
         Game();
         ~Game();

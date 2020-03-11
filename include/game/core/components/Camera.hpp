@@ -11,6 +11,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace game::core::components {
+    struct CameraData {
+        glm::mat4 pvmat;
+    };
+
     struct Camera {
         static constexpr f32 speed = 0.6f;
         static constexpr f32 sensitivity = 5.0e-2f;

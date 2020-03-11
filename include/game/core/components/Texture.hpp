@@ -11,15 +11,14 @@ namespace game::core::components {
     class Texture {
          api::Image image;
          vk::ImageView image_view;
-         vk::Sampler sampler;
 
-         const api::VulkanContext& ctx;
+         const api::VulkanContext* ctx;
     public:
-        explicit Texture(const api::VulkanContext&, const vk::Sampler);
+        explicit Texture(const api::VulkanContext*);
 
         void load(const std::filesystem::path&);
 
-        [[nodiscard]] vk::DescriptorImageInfo get_info() const;
+        [[nodiscard]] vk::DescriptorImageInfo get_info(const vk::Sampler) const;
     };
 } // namespace game::core::components
 
