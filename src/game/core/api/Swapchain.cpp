@@ -104,7 +104,7 @@ namespace game::core::api {
         logger::info("Swapchain images successfully created");
     }
 
-    static inline void make_depth_image(const VulkanContext& ctx, Swapchain& swapchain) {
+    [[maybe_unused]] static inline void make_depth_image(const VulkanContext& ctx, Swapchain& swapchain) {
         api::Image::CreateInfo create_info{}; {
             create_info.ctx = &ctx;
             create_info.format = vk::Format::eD32SfloatS8Uint;
@@ -136,7 +136,7 @@ namespace game::core::api {
         get_swapchain(ctx, swapchain);
         create_images(ctx, swapchain);
 
-        make_depth_image(ctx, swapchain);
+        //make_depth_image(ctx, swapchain);
 
         return swapchain;
     }

@@ -11,8 +11,7 @@
 
 namespace game::core::api::renderer {
     struct RenderGraph {
-        entt::entity main_camera;
-        std::vector<entt::entity> objects{};
+        std::vector<entt::entity> entities{};
         std::vector<components::Texture> textures{};
 
         api::MappedBuffer camera_buffer{};

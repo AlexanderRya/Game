@@ -37,6 +37,7 @@ namespace game::core::api {
 
 namespace game::core::components {
     struct GameObject;
+    struct Transform;
     class Texture;
 } // namespace game::core::components
 

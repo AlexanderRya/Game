@@ -4,20 +4,23 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
+#include <vector>
+
 namespace game::core::components {
     struct alignas(16) ModelColor {
         glm::mat4 model;
         glm::vec3 color;
     };
 
-    struct Transform {
+    struct Instance {
         glm::vec3 position{};
         glm::vec3 size{};
         glm::vec3 color{};
-        glm::vec3 velocity{};
         float rotation{};
-        bool is_solid{};
-        bool is_destroyed{};
+    };
+
+    struct Transform {
+        std::vector<Instance> instances;
     };
 } // namespace game::core::components
 

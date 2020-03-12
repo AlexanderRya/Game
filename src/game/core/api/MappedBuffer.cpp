@@ -11,7 +11,7 @@ namespace game::core::api {
         type_size = info.type_size;
 
         // Arbitrary number
-        allocate(1);
+        allocate(64);
     }
 
     void SingleMappedBuffer::allocate(const usize size) {

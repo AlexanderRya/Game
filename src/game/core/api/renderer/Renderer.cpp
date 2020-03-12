@@ -1,6 +1,7 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
 #include <game/core/components/GameObject.hpp>
 #include <game/core/api/renderer/Renderer.hpp>
+#include <game/core/components/Transform.hpp>
 #include <game/core/components/Texture.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/CommandBuffer.hpp>
@@ -8,6 +9,7 @@
 #include <game/core/api/Pipeline.hpp>
 #include <game/core/api/Sampler.hpp>
 #include <game/core/Globals.hpp>
+#include <game/core/Window.hpp>
 #include <game/Constants.hpp>
 #include <game/Logger.hpp>
 
@@ -95,8 +97,6 @@ namespace game::core::api::renderer {
                 buffer_info.type_size = sizeof(components::ModelColor);
             }
 
-            graph.camera_buffer.create(buffer_info);
-
             object.instance_buffer.create(buffer_info);
 
             std::vector<api::DescriptorSet::WriteInfo> write_info(3); {
@@ -118,34 +118,51 @@ namespace game::core::api::renderer {
     }
 
     void Renderer::update_camera(RenderGraph& graph, entt::registry& registry) {
-        auto& camera_data = registry.get<components::CameraData>(graph.main_camera);
+        auto temp_view = registry.view<components::CameraData>();
+        auto& camera_data = temp_view.get<components::CameraData>(temp_view[0]);
 
-        camera_data.pvmat = glm::mat4(1.0f);
+        camera_data.pvmat =
+            glm::ortho(
+                0.0f,
+                static_cast<float>(ctx.swapchain.extent.width),
+                static_cast<float>(ctx.swapchain.extent.height),
+                0.0f,
+                -1.0f, 1.0f);
+
+        camera_data.pvmat[1][1] *= -1;
 
         graph.camera_buffer[current_frame].write(&camera_data, 1);
     }
 
-    void Renderer::update_objects(entt::registry& registry) {
-        auto view = registry.view<components::GameObject, components::Texture>();
+    void Renderer::update_object(components::GameObject& object, const components::Transform& transform) {
+        std::vector<components::ModelColor> instances{};
+        instances.reserve(transform.instances.size());
 
-        for (auto& entity : view) {
-            auto [object, texture] = view.get<components::GameObject, components::Texture>(entity);
+        for (const auto& instance : transform.instances) {
+            auto& model_color = instances.emplace_back(); {
+                model_color.model = glm::mat4(1.0f);
+                model_color.model = glm::translate(model_color.model, instance.position);
+                model_color.model = glm::scale(model_color.model, instance.size);
+                model_color.model = glm::rotate(model_color.model, instance.rotation, glm::vec3{ 0.0f, 0.0f, 1.0f });
 
-            std::vector<components::ModelColor> instances{};
-            instances.reserve(object.transforms.size());
+                model_color.color = instance.color;
+            }
+        }
 
-            for (const auto& instance : object.transforms) {
-                auto& model_color = instances.emplace_back(); {
-                    model_color.model = glm::mat4(1.0f);
-                    model_color.model = glm::translate(model_color.model, instance.position);
-                    model_color.model = glm::scale(model_color.model, instance.size);
-                    model_color.model = glm::rotate(model_color.model, instance.rotation, glm::vec3{ 0.0f, 0.0f, 1.0f });
+        auto& current_buffer = object.instance_buffer[current_frame];
 
-                    model_color.color = instance.color;
-                }
+        if (current_buffer.size() != instances.size()) {
+            current_buffer.write(instances.data(), instances.size());
+
+            api::DescriptorSet::WriteInfo write_info{}; {
+                write_info.binding = static_cast<u32>(meta::PipelineBinding::Instance);
+                write_info.type = vk::DescriptorType::eStorageBuffer;
+                write_info.buffer_info = { current_buffer.get_info() };
             }
 
-            object.instance_buffer[current_frame].write(instances.data(), instances.size());
+            object.descriptor_set.write_at(current_frame, write_info);
+        } else {
+            current_buffer.write(instances.data(), instances.size());
         }
     }
 
@@ -174,10 +191,10 @@ namespace game::core::api::renderer {
 
         command_buffer.begin(begin_info, ctx.dispatcher);
 
-        std::array<vk::ClearValue, 2> clear_values{}; {
+        std::array<vk::ClearValue, 1> clear_values{}; {
             clear_values[0].color = { std::array { 0.01f, 0.01f, 0.01f, 0.01f } };
 
-            clear_values[1].depthStencil = { { 1.0f, 0 } };
+            // clear_values[1].depthStencil = { { 1.0f, 0 } };
         }
 
         vk::RenderPassBeginInfo render_pass_begin_info{}; {
@@ -209,26 +226,24 @@ namespace game::core::api::renderer {
     }
 
     void Renderer::draw(RenderGraph& graph, entt::registry& registry) {
-        auto objects_view = registry.view<components::GameObject, components::Texture>();
+        auto objects_view = registry.view<components::GameObject, components::Transform, components::Texture>();
         auto& command_buffer = command_buffers[image_index];
 
         update_camera(graph, registry);
-        update_objects(registry);
 
         command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipelines[meta::PipelineType::MeshGeneric].handle, ctx.dispatcher);
 
-        for (const auto& entities : objects_view) {
-            auto [object, texture] = objects_view.get<components::GameObject, components::Texture>(entities);
+        for (auto it = objects_view.end(); it != objects_view.begin();) {
+            auto [object, transform, texture] = objects_view.get<components::GameObject, components::Transform, components::Texture>(*--it);
+            update_object(object, transform);
 
             command_buffer.bindVertexBuffers(0, vertex_buffers[object.vertex_buffer_idx].buffer.handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eGraphics,
                 layouts[meta::PipelineLayoutType::MeshGeneric].pipeline,
-                0,
-                object.descriptor_set[current_frame],
-                nullptr,
-                ctx.dispatcher);
-            command_buffer.draw(object.vertex_count, object.transforms.size(), 0, 0, ctx.dispatcher);
+                0, object.descriptor_set[current_frame],
+                nullptr, ctx.dispatcher);
+            command_buffer.draw(object.vertex_count, transform.instances.size(), 0, 0, ctx.dispatcher);
         }
     }
 

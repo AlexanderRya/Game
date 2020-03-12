@@ -64,7 +64,9 @@ set(GAME_HEADERS
         include/game/core/api/Sampler.hpp
         include/game/core/api/renderer/RenderGraph.hpp
         include/game/core/components/GameObject.hpp
-        include/game/core/components/Transform.hpp)
+        include/game/core/components/Transform.hpp
+        include/game/core/components/Brick.hpp
+        include/game/core/gameplay/Level.hpp)
 
 set(GAME_SOURCES
         ${STB_SOURCES}
@@ -91,14 +93,14 @@ set(GAME_SOURCES
         src/game/core/components/Camera.cpp
         src/game/core/api/Image.cpp
         src/game/core/components/Texture.cpp
-        src/game/core/api/Sampler.cpp )
+        src/game/core/api/Sampler.cpp src/game/core/gameplay/Level.cpp)
 
 add_executable(Game
         ${GAME_HEADERS}
         ${GAME_SOURCES})
 
 if (UNIX)
-    target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+    target_compile_options(Game PRIVATE -std=c++20 -O0 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
 endif()
 
 if (WIN32)

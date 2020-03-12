@@ -42,7 +42,7 @@ namespace game::core::api {
         vk::SubpassDescription subpass_description{}; {
             subpass_description.colorAttachmentCount = 1;
             subpass_description.pColorAttachments = &color_attachment;
-            subpass_description.pDepthStencilAttachment = &depth_attachment;
+            subpass_description.pDepthStencilAttachment = nullptr;
             subpass_description.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
         }
 
@@ -55,9 +55,8 @@ namespace game::core::api {
             subpass_dependency.dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
         }
 
-        std::array<vk::AttachmentDescription, 2> attachments {
-            color_description,
-            depth_description
+        std::array<vk::AttachmentDescription, 1> attachments {
+            color_description
         };
 
         vk::RenderPassCreateInfo render_pass_create_info{}; {

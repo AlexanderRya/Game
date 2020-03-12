@@ -39,7 +39,7 @@ namespace game::core::api::renderer {
         
         // Drawing
         void update_camera(RenderGraph&, entt::registry&);
-        void update_objects(entt::registry&);
+        void update_object(components::GameObject&, const components::Transform&);
 
         u32 acquire_frame();
         void start();
