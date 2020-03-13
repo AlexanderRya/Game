@@ -9,9 +9,7 @@
 
 namespace game::core::components {
     Texture::Texture(const api::VulkanContext* ctx)
-        : ctx(ctx) {
-        stbi_set_flip_vertically_on_load(true);
-    }
+        : ctx(ctx) {}
 
     void Texture::load(const std::filesystem::path& path) {
         i32 width{}, height{}, channels{};

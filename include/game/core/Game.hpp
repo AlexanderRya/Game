@@ -2,6 +2,7 @@
 #define GAME_GAME_HPP
 
 #include <game/core/api/renderer/Renderer.hpp>
+#include <game/core/gameplay/GameLevel.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/Pipeline.hpp>
 #include <game/core/Window.hpp>
@@ -14,10 +15,15 @@ namespace game::core {
         Window window;
         api::VulkanContext context;
         api::renderer::Renderer renderer;
+
+        std::vector<gameplay::GameLevel> levels;
     public:
         Game();
         ~Game();
 
+        void load();
+        void process_collisions(gameplay::GameLevel&);
+        void process_input(gameplay::GameLevel&);
         void run();
     };
 } // namespace game::core

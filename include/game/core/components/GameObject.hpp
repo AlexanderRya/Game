@@ -6,7 +6,7 @@
 
 namespace game::core::components {
     struct GameObject {
-        u64 vertex_buffer_idx{};
+        usize vertex_buffer_idx{};
         u64 vertex_count{};
 
         api::DescriptorSet descriptor_set{};

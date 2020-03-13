@@ -12,14 +12,14 @@ namespace game::core::components {
         glm::vec3 color;
     };
 
-    struct Instance {
-        glm::vec3 position{};
-        glm::vec3 size{};
-        glm::vec3 color{};
-        float rotation{};
-    };
-
     struct Transform {
+        struct Instance {
+            glm::vec3 position{};
+            glm::vec3 size{};
+            glm::vec3 color{};
+            float rotation{};
+        };
+
         std::vector<Instance> instances;
     };
 } // namespace game::core::components

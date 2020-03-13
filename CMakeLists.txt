@@ -66,7 +66,8 @@ set(GAME_HEADERS
         include/game/core/components/GameObject.hpp
         include/game/core/components/Transform.hpp
         include/game/core/components/Brick.hpp
-        include/game/core/gameplay/Level.hpp)
+        include/game/core/gameplay/GameLevel.hpp
+        include/game/core/components/Player.hpp include/game/core/components/Ball.hpp)
 
 set(GAME_SOURCES
         ${STB_SOURCES}
@@ -93,7 +94,8 @@ set(GAME_SOURCES
         src/game/core/components/Camera.cpp
         src/game/core/api/Image.cpp
         src/game/core/components/Texture.cpp
-        src/game/core/api/Sampler.cpp src/game/core/gameplay/Level.cpp)
+        src/game/core/api/Sampler.cpp
+        src/game/core/gameplay/GameLevel.cpp)
 
 add_executable(Game
         ${GAME_HEADERS}

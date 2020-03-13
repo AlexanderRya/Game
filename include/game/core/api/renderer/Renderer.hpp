@@ -1,6 +1,7 @@
 #ifndef GAME_RENDERER_HPP
 #define GAME_RENDERER_HPP
-#include <entt/src/entt/entity/registry.hpp>
+
+#include <game/core/gameplay/GameLevel.hpp>
 #include <game/core/api/VertexBuffer.hpp>
 #include <game/core/api/Pipeline.hpp>
 #include <game/Constants.hpp>
@@ -43,7 +44,7 @@ namespace game::core::api::renderer {
 
         u32 acquire_frame();
         void start();
-        void draw(RenderGraph&, entt::registry&);
+        void draw(gameplay::GameLevel&);
         void end();
         void submit();
     };

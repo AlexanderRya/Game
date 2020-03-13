@@ -3,6 +3,7 @@
 #include <game/core/api/renderer/Renderer.hpp>
 #include <game/core/components/Transform.hpp>
 #include <game/core/components/Texture.hpp>
+#include <game/core/gameplay/GameLevel.hpp>
 #include <game/core/api/VulkanContext.hpp>
 #include <game/core/api/CommandBuffer.hpp>
 #include <game/core/api/VertexBuffer.hpp>
@@ -16,8 +17,8 @@
 namespace game::core::api::renderer {
     static inline std::vector<Vertex> generate_triangle_geometry() {
         return { {
-            { { 0.0f, 0.5f, 0.0f }, { 0.0f, 0.5f } },
-            { { 0.5f, -0.5f, 0.0f }, { 0.5f, -0.5f } },
+            { {  0.0f,  0.5f, 0.0f }, {  0.0f,  0.5f } },
+            { {  0.5f, -0.5f, 0.0f }, {  0.5f, -0.5f } },
             { { -0.5f, -0.5f, 0.0f }, { -0.5f, -0.5f } }
         } };
     }
@@ -81,8 +82,8 @@ namespace game::core::api::renderer {
 
         auto view = registry.view<components::GameObject, components::Texture>();
 
-        for (auto& each : view) {
-            auto [object, texture] = view.get<components::GameObject, components::Texture>(each);
+        for (auto& entity : view) {
+            auto [object, texture] = view.get<components::GameObject, components::Texture>(entity);
 
             api::DescriptorSet::CreateInfo descriptor_set_info{}; {
                 descriptor_set_info.ctx = &ctx;
@@ -225,16 +226,17 @@ namespace game::core::api::renderer {
         command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
     }
 
-    void Renderer::draw(RenderGraph& graph, entt::registry& registry) {
-        auto objects_view = registry.view<components::GameObject, components::Transform, components::Texture>();
+    void Renderer::draw(gameplay::GameLevel& level) {
+        auto objects_view = level.registry.view<components::GameObject, components::Transform, components::Texture>();
         auto& command_buffer = command_buffers[image_index];
 
-        update_camera(graph, registry);
+        update_camera(level.graph, level.registry);
 
         command_buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, pipelines[meta::PipelineType::MeshGeneric].handle, ctx.dispatcher);
 
         for (auto it = objects_view.end(); it != objects_view.begin();) {
             auto [object, transform, texture] = objects_view.get<components::GameObject, components::Transform, components::Texture>(*--it);
+
             update_object(object, transform);
 
             command_buffer.bindVertexBuffers(0, vertex_buffers[object.vertex_buffer_idx].buffer.handle, static_cast<vk::DeviceSize>(0), ctx.dispatcher);

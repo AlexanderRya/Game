@@ -72,6 +72,7 @@ namespace game::core::api {
             write.dstSet = descriptor_sets[idx];
             write.pTexelBufferView = nullptr;
             if (!write_info.buffer_info.empty()) {
+                assert(write_info.buffer_info.size() == 1);
                 write.pBufferInfo = &write_info.buffer_info[0];
             } else {
                 write.pImageInfo = &write_info.image_info;

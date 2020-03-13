@@ -1,5 +1,5 @@
-#ifndef GAME_BRICK_HPP
-#define GAME_BRICK_HPP
+#ifndef GAME_BALL_HPP
+#define GAME_BALL_HPP
 
 #include <game/core/components/Transform.hpp>
 #include <game/core/api/DescriptorSet.hpp>
@@ -10,13 +10,11 @@
 #include <vector>
 
 namespace game::core::components {
-    struct Brick {
-        struct Info {
-            bool is_solid{};
-        };
-
-        std::vector<Info> info{};
+    struct Ball {
+        glm::vec3 velocity;
+        float radius;
+        bool is_stuck;
     };
 } // namespace game::core::components
 
-#endif //GAME_BRICK_HPP
+#endif //GAME_BALL_HPP
