@@ -15,7 +15,7 @@ namespace game::core::api {
             color_description.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
             color_description.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
             color_description.initialLayout = vk::ImageLayout::eUndefined;
-            color_description.finalLayout = vk::ImageLayout::ePresentSrcKHR;
+            color_description.finalLayout = vk::ImageLayout::eColorAttachmentOptimal;
         }
 
         vk::AttachmentReference color_attachment{}; {

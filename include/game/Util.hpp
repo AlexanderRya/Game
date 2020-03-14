@@ -10,6 +10,8 @@
 #if _WIN32
     #include <Windows.h>
     #include <libloaderapi.h>
+    #undef min
+    #undef max
 #elif __linux__
     #include <dlfcn.h>
 #endif

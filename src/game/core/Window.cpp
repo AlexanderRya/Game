@@ -89,4 +89,8 @@ namespace game::core {
     i32 Window::get_key(const i32 key) const {
         return glfwGetKey(window, key);
     }
+
+    GLFWwindow* Window::handle() const {
+        return window;
+    }
 } // namespace game::core

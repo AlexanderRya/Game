@@ -1,6 +1,7 @@
 #ifndef GAME_GAME_HPP
 #define GAME_GAME_HPP
 
+#include <game/core/api/imgui/ImGuiContext.hpp>
 #include <game/core/api/renderer/Renderer.hpp>
 #include <game/core/gameplay/GameLevel.hpp>
 #include <game/core/api/VulkanContext.hpp>
@@ -15,6 +16,7 @@ namespace game::core {
         Window window;
         api::VulkanContext context;
         api::renderer::Renderer renderer;
+        api::imgui::ImGuiContext imgui_context;
 
         std::vector<gameplay::GameLevel> levels;
     public:

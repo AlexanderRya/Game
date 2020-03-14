@@ -20,6 +20,7 @@ namespace game::core::api::renderer {
         std::vector<vk::CommandBuffer> command_buffers;
 
         const VulkanContext& ctx;
+        const api::imgui::ImGuiContext& imgui_ctx;
 
         // Drawing stuff
         std::vector<api::VertexBuffer> vertex_buffers;
@@ -28,11 +29,12 @@ namespace game::core::api::renderer {
         std::unordered_map<meta::PipelineLayoutType, api::PipelineLayout> layouts;
         std::unordered_map<meta::SamplerType, vk::Sampler> samplers;
 
-        u32 frames_rendered{};
         u32 image_index{};
         u32 current_frame{};
     public:
-        explicit Renderer(const VulkanContext&);
+        u32 frames_rendered{};
+
+        explicit Renderer(const VulkanContext&, const api::imgui::ImGuiContext&);
 
         // Loading
         void init_rendering_data();
@@ -45,6 +47,7 @@ namespace game::core::api::renderer {
         u32 acquire_frame();
         void start();
         void draw(gameplay::GameLevel&);
+        void draw_imgui();
         void end();
         void submit();
     };

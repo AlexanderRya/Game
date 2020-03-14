@@ -11,8 +11,10 @@ include_directories(Game
         include
         external
         external/glm
+        external/imgui
         external/entt/src
         external/glfw/include
+        external/imgui/examples
         external/VulkanMemoryAllocator/src
         ${Vulkan_INCLUDE_DIRS})
 
@@ -21,6 +23,24 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_CXX_STANDARD 20)
+
+set(IMGUI_SOURCES
+        external/imgui/imgui.cpp
+        external/imgui/imgui_demo.cpp
+        external/imgui/imgui_draw.cpp
+        external/imgui/imgui_widgets.cpp
+        external/imgui/examples/imgui_impl_glfw.cpp
+        external/imgui/examples/imgui_impl_vulkan.cpp)
+
+set(IMGUI_HEADERS
+        external/imgui/imconfig.h
+        external/imgui/imgui.h
+        external/imgui/imgui_internal.h
+        external/imgui/imstb_rectpack.h
+        external/imgui/imstb_textedit.h
+        external/imgui/imstb_truetype.h
+        external/imgui/examples/imgui_impl_glfw.h
+        external/imgui/examples/imgui_impl_vulkan.h)
 
 set(STB_HEADERS
         external/stb/stb.h
@@ -33,6 +53,7 @@ set(VMA_HEADERS
         external/VulkanMemoryAllocator/src/vk_mem_alloc.h)
 
 set(GAME_HEADERS
+        ${IMGUI_HEADERS}
         ${STB_HEADERS}
         ${VMA_HEADERS}
         include/game/Logger.hpp
@@ -67,9 +88,11 @@ set(GAME_HEADERS
         include/game/core/components/Transform.hpp
         include/game/core/components/Brick.hpp
         include/game/core/gameplay/GameLevel.hpp
-        include/game/core/components/Player.hpp include/game/core/components/Ball.hpp)
+        include/game/core/components/Player.hpp
+        include/game/core/components/Ball.hpp include/game/core/api/imgui/ImGuiContext.hpp)
 
 set(GAME_SOURCES
+        ${IMGUI_SOURCES}
         ${STB_SOURCES}
         src/main.cpp
         src/game/Util.cpp
@@ -95,14 +118,16 @@ set(GAME_SOURCES
         src/game/core/api/Image.cpp
         src/game/core/components/Texture.cpp
         src/game/core/api/Sampler.cpp
-        src/game/core/gameplay/GameLevel.cpp)
+        src/game/core/gameplay/GameLevel.cpp src/game/core/api/imgui/ImGuiContext.cpp)
 
 add_executable(Game
         ${GAME_HEADERS}
         ${GAME_SOURCES})
 
 if (UNIX)
-    target_compile_options(Game PRIVATE -std=c++20 -O0 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+    target_compile_options(Game PRIVATE -std=c++20 -O3 -pedantic -pedantic-errors -m64 -Wall -Wextra -Werror -Wno-c99-extensions -Wno-shadow)
+elseif (WIN32)
+    target_compile_options(Game PRIVATE -std=c++20 -O3 -m64 -Wno-everything)
 endif()
 
 if (WIN32)
@@ -127,7 +152,7 @@ if (UNIX)
 endif()
 
 if (WIN32)
-    target_link_libraries(Game glfw)
+    target_link_libraries(Game glfw "F:/Programs/Vulkan/1.2.131.2/Lib/vulkan-1.lib")
 elseif (UNIX)
-    target_link_libraries(Game glfw pthread)
+    target_link_libraries(Game glfw pthread ${Vulkan_LIBRARIES})
 endif()

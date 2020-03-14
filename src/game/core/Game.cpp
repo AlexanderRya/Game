@@ -7,7 +7,10 @@
 #include <game/core/api/Sampler.hpp>
 #include <game/core/Globals.hpp>
 #include <game/core/Game.hpp>
-#include <game/Util.hpp>
+
+#include <imgui.h>
+#include <imgui_impl_vulkan.h>
+#include <imgui_impl_glfw.h>
 
 #include <iostream>
 #include <fstream>
@@ -16,7 +19,8 @@ namespace game::core {
     Game::Game()
     : window(1600, 900, "Game"),
       context(api::make_vulkan_context(&window)),
-      renderer(context) {
+      imgui_context(api::imgui::make_imgui_context(window, context)),
+      renderer(context, imgui_context) {
         renderer.init_rendering_data();
     }
 
@@ -32,24 +36,31 @@ namespace game::core {
         auto& registry = level.registry;
 
         const auto bricks = registry.view<components::Transform, components::Brick>();
-        auto ball = registry.view<components::Transform, components::Ball>();
+        const auto ball = registry.view<components::Transform, components::Ball>();
 
         const auto& ball_instance = ball.get<components::Transform>(*ball.begin()).instances[0];
+        auto& ball_info = ball.get<components::Ball>(*ball.begin());
 
         for (const auto& each : bricks) {
             auto& brick_instances = bricks.get<components::Transform>(each).instances;
             auto& brick_info = bricks.get<components::Brick>(each).info;
 
             for (usize i = 0; i < brick_instances.size(); ++i) {
-                bool x_collision =
-                    ball_instance.position.x + ball_instance.size.x >= brick_instances[i].position.x &&
-                    brick_instances[i].position.x + brick_instances[i].size.x >= ball_instance.position.x;
+                glm::vec2 center(ball_instance.position + ball_info.radius);
 
-                bool y_collision =
-                    ball_instance.position.y + ball_instance.size.y >= brick_instances[i].position.y &&
-                    brick_instances[i].position.y + brick_instances[i].size.y >= ball_instance.position.y;
+                glm::vec2 aabb_half_extents(brick_instances[i].size.x / 2, brick_instances[i].size.y / 2);
+                glm::vec2 aabb_center(
+                    brick_instances[i].position.x + aabb_half_extents.x,
+                    brick_instances[i].position.y + aabb_half_extents.y);
 
-                if (x_collision && y_collision && !brick_info[i].is_solid) {
+                glm::vec2 difference = center - aabb_center;
+                glm::vec2 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
+
+                glm::vec2 closest = aabb_center + clamped;
+
+                difference = closest - center;
+
+                if (glm::length(difference) < ball_info.radius && !brick_info[i].is_solid) {
                     brick_info.erase(brick_info.begin() + i);
                     brick_instances.erase(brick_instances.begin() + i);
                 }
@@ -122,10 +133,34 @@ namespace game::core {
     void Game::run() {
         constexpr static usize level_idx = 0;
 
+        auto ball_view = levels[level_idx].registry.view<components::Ball, components::Transform>();
+
         while (!window.should_close()) {
             f32 frame_time = glfwGetTime();
             delta_time = frame_time - last_frame;
             last_frame = frame_time;
+
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            ImGui::SetNextWindowSize({ 400.0f, 0.0f });
+            ImGui::SetNextWindowPos({ static_cast<float>(context.swapchain.extent.width - 400), 0.0f });
+            ImGui::Begin("Debug info");
+            ImGui::Text("fps: %.2f, delta_time: %.5f, frame: %llu",
+                        1 / delta_time,
+                        delta_time,
+                        renderer.frames_rendered);
+            ImGui::End();
+            auto& ball_instance = ball_view.get<components::Transform>(*ball_view.begin()).instances[0];
+            ImGui::SetNextWindowSize({ 250.0f, 0.0f });
+            ImGui::SetNextWindowPos({ static_cast<float>(context.swapchain.extent.width - 250), 47.0f });
+            ImGui::Begin("Ball info");
+            ImGui::Text("x: %.2f, y: %.2f, z: %.2f",
+                        ball_instance.position.x,
+                        ball_instance.position.y,
+                        ball_instance.position.z);
+            ImGui::End();
+            ImGui::Render();
 
             window.poll_events();
 
@@ -137,6 +172,8 @@ namespace game::core {
             renderer.start(); {
                 renderer.draw(levels[level_idx]);
             } renderer.end();
+
+            renderer.draw_imgui();
 
             renderer.submit();
         }

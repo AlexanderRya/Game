@@ -1,4 +1,5 @@
 #include <game/core/api/renderer/RenderGraph.hpp>
+#include <game/core/api/imgui/ImGuiContext.hpp>
 #include <game/core/components/GameObject.hpp>
 #include <game/core/api/renderer/Renderer.hpp>
 #include <game/core/components/Transform.hpp>
@@ -13,6 +14,10 @@
 #include <game/core/Window.hpp>
 #include <game/Constants.hpp>
 #include <game/Logger.hpp>
+
+#include <imgui/imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
 
 namespace game::core::api::renderer {
     static inline std::vector<Vertex> generate_triangle_geometry() {
@@ -34,8 +39,9 @@ namespace game::core::api::renderer {
         } };
     }
 
-    Renderer::Renderer(const api::VulkanContext& context)
-    : ctx(context) {
+    Renderer::Renderer(const api::VulkanContext& context, const api::imgui::ImGuiContext& imgui_ctx)
+    : ctx(context),
+      imgui_ctx(imgui_ctx) {
         command_buffers = api::make_rendering_command_buffers(ctx);
 
         vk::SemaphoreCreateInfo semaphore_create_info{};
@@ -249,6 +255,60 @@ namespace game::core::api::renderer {
         }
     }
 
+    void Renderer::draw_imgui() {
+        auto& command_buffer = imgui_ctx.command_buffers[image_index];
+
+        vk::CommandBufferBeginInfo begin_info{}; {
+            begin_info.flags |= vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+        }
+
+        command_buffer.begin(begin_info, ctx.dispatcher);
+
+        vk::ImageMemoryBarrier barrier{}; {
+            barrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+            barrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead;
+            barrier.image = ctx.swapchain.images[image_index];
+            barrier.oldLayout = vk::ImageLayout::eColorAttachmentOptimal;
+            barrier.newLayout = vk::ImageLayout::eColorAttachmentOptimal;
+            barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+            barrier.subresourceRange.levelCount = 1;
+            barrier.subresourceRange.baseMipLevel = 0;
+            barrier.subresourceRange.layerCount = 1;
+            barrier.subresourceRange.baseArrayLayer = 0;
+        }
+
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            {},
+            nullptr, nullptr, barrier,
+            ctx.dispatcher);
+
+        std::array<vk::ClearValue, 1> clear_values{}; {
+            clear_values[0].color = { std::array { 0.01f, 0.01f, 0.01f, 0.01f } };
+
+            // clear_values[1].depthStencil = { { 1.0f, 0 } };
+        }
+
+        vk::RenderPassBeginInfo render_pass_begin_info{}; {
+            render_pass_begin_info.renderArea.extent = ctx.swapchain.extent;
+            render_pass_begin_info.framebuffer = ctx.default_framebuffers[image_index];
+            render_pass_begin_info.renderPass = imgui_ctx.render_pass;
+            render_pass_begin_info.clearValueCount = clear_values.size();
+            render_pass_begin_info.pClearValues = clear_values.data();
+        }
+
+        command_buffer.beginRenderPass(render_pass_begin_info, vk::SubpassContents::eInline, ctx.dispatcher);
+
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
+
+        command_buffer.endRenderPass(ctx.dispatcher);
+
+        command_buffer.end(ctx.dispatcher);
+    }
+
     void Renderer::end() {
         auto& command_buffer = command_buffers[image_index];
 
@@ -259,9 +319,15 @@ namespace game::core::api::renderer {
 
     void Renderer::submit() {
         vk::PipelineStageFlags wait_mask{ vk::PipelineStageFlagBits::eColorAttachmentOutput };
+
+        std::array<vk::CommandBuffer, 2> buffers{
+            command_buffers[image_index],
+            imgui_ctx.command_buffers[image_index]
+        };
+
         vk::SubmitInfo submit_info{}; {
-            submit_info.commandBufferCount = 1;
-            submit_info.pCommandBuffers = &command_buffers[image_index];
+            submit_info.commandBufferCount = buffers.size();
+            submit_info.pCommandBuffers = buffers.data();
             submit_info.pWaitDstStageMask = &wait_mask;
             submit_info.waitSemaphoreCount = 1;
             submit_info.pWaitSemaphores = &image_available[current_frame];

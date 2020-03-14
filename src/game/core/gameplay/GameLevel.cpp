@@ -44,18 +44,18 @@ namespace game::core::gameplay {
         graph.textures.emplace_back(&ctx).load("../resources/textures/paddle.png");
         graph.textures.emplace_back(&ctx).load("../resources/textures/awesome_face.png");
 
-        graph.entities.emplace_back(registry.create()); {
-            registry.assign<components::CameraData>(graph.entities.back());
+        auto main_camera = registry.create(); {
+            registry.assign<components::CameraData>(main_camera);
         }
 
-        graph.entities.emplace_back(registry.create()); {
+        auto background_entity = registry.create(); {
             components::GameObject background{}; {
                 background.vertex_buffer_idx = 1;
                 background.vertex_count = 6;
             }
 
-            registry.assign<components::GameObject>(graph.entities.back(), background);
-            registry.assign<components::Transform>(graph.entities.back(), components::Transform{
+            registry.assign<components::GameObject>(background_entity, background);
+            registry.assign<components::Transform>(background_entity, components::Transform{
                 .instances = {
                     components::Transform::Instance{
                         .position = { 0.0f, -Window::height, 0.0f },
@@ -65,7 +65,7 @@ namespace game::core::gameplay {
                     }
                 }
             });
-            registry.assign<components::Texture>(graph.entities.back(), graph.textures[0]);
+            registry.assign<components::Texture>(background_entity, graph.textures[0]);
         }
 
         std::ifstream in(path);
@@ -87,8 +87,8 @@ namespace game::core::gameplay {
         f32 unit_width = w_width / static_cast<f32>(width);
         f32 unit_height = w_height / static_cast<f32>(height);
         /* Bricks loading */ {
-            auto& solid_bricks = graph.entities.emplace_back(registry.create());
-            auto& bricks = graph.entities.emplace_back(registry.create());
+            auto solid_bricks = registry.create();
+            auto bricks = registry.create();
 
             registry.assign<components::Texture>(bricks, graph.textures[1]);
             registry.assign<components::Texture>(solid_bricks, graph.textures[2]);
@@ -161,7 +161,7 @@ namespace game::core::gameplay {
         constexpr float ball_radius = 17.5f;
 
         /* Player */ {
-            auto& player = graph.entities.emplace_back(registry.create());
+            auto player = registry.create();
 
             registry.assign<components::GameObject>(player, components::GameObject{
                 .vertex_buffer_idx = 1,
@@ -181,7 +181,7 @@ namespace game::core::gameplay {
         }
 
         /* Ball */ {
-            auto& ball = graph.entities.emplace_back(registry.create());
+            auto ball = registry.create();
 
             registry.assign<components::GameObject>(ball, components::GameObject{
                 .vertex_buffer_idx = 1,

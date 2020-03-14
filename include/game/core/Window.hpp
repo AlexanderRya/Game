@@ -25,6 +25,7 @@ namespace game::core {
         void set_user_pointer(void*);
         [[nodiscard]] bool should_close() const;
         [[nodiscard]] i32 get_key(const i32) const;
+        [[nodiscard]] GLFWwindow* handle() const;
     };
 } // namespace game::core
 

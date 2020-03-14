@@ -27,9 +27,6 @@ namespace game::core::api {
     struct Swapchain;
     class DescriptorSet;
     struct Image;
-} // namespace game::core::api
-
-namespace game::core::api {
     struct VertexBuffer;
     class MappedBuffer;
     class SingleMappedBuffer;
@@ -44,5 +41,9 @@ namespace game::core::components {
 namespace game::core::api::renderer {
     struct RenderGraph;
 } // namespace game::core::api::renderer
+
+namespace game::core::api::imgui {
+    struct ImGuiContext;
+} // namespace game::core::api::imgui
 
 #endif //GAME_FORWARDS_HPP
